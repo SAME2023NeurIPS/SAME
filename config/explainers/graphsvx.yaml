@@ -1,0 +1,33 @@
+explainer_name: 'graphsvx'
+explanation_result_path: ''
+sparsity: 0.5
+hops: 2
+num_samples: 10
+info: True
+multiclass: False
+fullempty: None
+S: 3
+hv: 'graph_classification'
+feat: 'Null'
+coal: 'Smarter'
+g: 'WLS'
+regu: 0
+
+param:
+  bbbp:
+    subgraph_building_method: 'split'
+  graph_sst2:
+    subgraph_building_method: 'split'
+  mutag:
+    subgraph_building_method: 'split'
+  ba_2motifs:
+    subgraph_building_method: 'split'
+  bace:
+    subgraph_building_method: 'split'
+  twitter:
+    subgraph_building_method: 'split'
+  ba_shapes_khop_graph:
+    subgraph_building_method: 'split'
+  ba_shapes_2hop_graph:
+    subgraph_building_method: 'split'
+  

@@ -1,0 +1,9 @@
+defaults:
+  - models: gcn
+  - datasets: bbbp
+  - explainers: subgraphx
+random_seed: 2
+device_id: 2
+record_filename: result_jsons
+sparsity: 0.8
+max_ex_size: 5

@@ -1,0 +1,119 @@
+gnn_saving_dir: 'checkpoints'
+gnn_name: 'gat'
+
+param:
+  graph_sst2:
+    learning_rate: 0.001
+    weight_decay: 0.0
+    milestones: None
+    gamma: None
+    batch_size: 256
+    num_epochs: 50
+    num_early_stop: 10
+    gat_dropout: 0.6 
+    gat_heads: 10
+    gat_hidden: 10
+    gat_concate: True
+    gnn_latent_dim:
+      - 128
+      - 128
+      - 128
+    gnn_dropout: 0.0
+    add_self_loop: True
+    gnn_emb_normalization: False
+    graph_classification: True
+    node_classification: False
+    readout: 'max'
+    fc_latent_dim: []
+  graph_sst5:
+    learning_rate: 0.001
+    weight_decay: 0.0
+    milestones: None
+    gamma: None
+    batch_size: 256
+    num_epochs: 50
+    num_early_stop: 10
+    gat_dropout: 0.6 
+    gat_heads: 10
+    gat_hidden: 10
+    gat_concate: True
+    gnn_latent_dim:
+      - 128
+      - 128
+      - 128
+    gnn_dropout: 0.0
+    add_self_loop: True
+    gnn_emb_normalization: False
+    graph_classification: True
+    node_classification: False
+    readout: 'max'
+    fc_latent_dim: []
+  bbbp:
+    learning_rate: 0.001
+    weight_decay: 0.0
+    milestones: None
+    gamma: None
+    batch_size: 64
+    num_epochs: 50
+    num_early_stop: 10
+    gat_dropout: 0.6 
+    gat_heads: 10
+    gat_hidden: 10
+    gat_concate: True
+    gnn_latent_dim:
+      - 128
+      - 128
+      - 128
+    gnn_dropout: 0.0
+    add_self_loop: True
+    gnn_emb_normalization: False
+    graph_classification: True
+    node_classification: False
+    readout: 'max'
+    fc_latent_dim: []
+  ba_2motifs:
+    learning_rate: 0.001
+    weight_decay: 0.0
+    milestones: None
+    gamma: None
+    batch_size: 64
+    num_epochs: 50
+    num_early_stop: 10
+    gat_dropout: 0.6 
+    gat_heads: 10
+    gat_hidden: 10
+    gat_concate: True
+    gnn_latent_dim:
+      - 128
+      - 128
+      - 128
+    gnn_dropout: 0.0
+    add_self_loop: True
+    gnn_emb_normalization: False
+    graph_classification: True
+    node_classification: False
+    readout: 'max'
+    fc_latent_dim: []
+  mutag:
+    learning_rate: 0.001
+    weight_decay: 0.0
+    milestones: None
+    gamma: None
+    batch_size: 64
+    num_epochs: 50
+    num_early_stop: 10
+    gat_dropout: 0.6 
+    gat_heads: 10
+    gat_hidden: 10
+    gat_concate: True
+    gnn_latent_dim:
+      - 128
+      - 128
+      - 128
+    gnn_dropout: 0.0
+    add_self_loop: True
+    gnn_emb_normalization: False
+    graph_classification: True
+    node_classification: False
+    readout: 'max'
+    fc_latent_dim: []

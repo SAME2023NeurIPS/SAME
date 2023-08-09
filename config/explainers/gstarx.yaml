@@ -1,0 +1,59 @@
+explainer_name: 'gstarx'
+explanation_result_path: ''
+sparsity: 0.8
+superadditive_ext: False
+sample_method: 'random'
+num_samples: -1
+num_hops: 4
+
+param:
+  bbbp:
+    payoff_type: 'norm_prob'
+    max_sample_size: 10
+    tau: 0.01
+    subgraph_building_method: 'remove'
+  graph_sst2:
+    payoff_type: 'norm_prob'
+    max_sample_size: 10
+    tau: 0.01
+    subgraph_building_method: 'remove'
+  graph_sst5:
+    payoff_type: 'norm_prob'
+    max_sample_size: 10
+    tau: 0.01
+    subgraph_building_method: 'remove'
+  mutag:
+    payoff_type: 'norm_prob'
+    max_sample_size: 10
+    tau: 0.01
+    subgraph_building_method: 'remove'
+  ba_2motifs:
+    payoff_type: 'norm_prob'
+    max_sample_size: 10
+    tau: 0.01
+    subgraph_building_method: 'remove'
+  bace:
+    payoff_type: 'norm_prob'
+    max_sample_size: 10
+    tau: 0.01
+    subgraph_building_method: 'remove'
+  twitter:
+    payoff_type: 'norm_prob'
+    max_sample_size: 10
+    tau: 0.01
+    subgraph_building_method: 'remove'
+  ba_shapes_khop_graph:
+    payoff_type: 'norm_prob'
+    max_sample_size: 10
+    tau: 0.01
+    subgraph_building_method: 'remove'
+  ba_shapes_2hop_graph:
+    payoff_type: 'norm_prob'
+    max_sample_size: 10
+    tau: 0.01
+    subgraph_building_method: 'remove'
+  ba_shapes:
+    payoff_type: 'norm_prob'
+    max_sample_size: 10
+    tau: 0.01
+    subgraph_building_method: 'split'

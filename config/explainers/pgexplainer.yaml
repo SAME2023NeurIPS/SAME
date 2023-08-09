@@ -1,0 +1,78 @@
+explainer_saving_dir: ''
+explainer_saving_name: 'pgexplainer.pth'
+explanation_result_dir: ''
+sparsity: 0.8
+
+param:
+  bbbp:
+    ex_learning_rate: 0.05
+    ex_epochs: 20
+    coff_size: 0.01
+    coff_ent: 0.01
+    t0: 5.0
+    t1: 1.0
+    undirected: True
+    sample_bias: 0
+  ba_shapes:
+    ex_learning_rate: 0.001
+    ex_epochs: 10
+    coff_size: 0.01
+    coff_ent: 0.01
+    t0: 5.0
+    t1: 0.1
+    undirected: True
+    sample_bias: 0
+  graph_sst2:
+    ex_learning_rate: 3e-3
+    ex_epochs: 20
+    coff_size: 0.01
+    coff_ent: 5e-4
+    t0: 5.0
+    t1: 1.0
+    undirected: True
+    sample_bias: 0
+  graph_sst5:
+    ex_learning_rate: 3e-3
+    ex_epochs: 20
+    coff_size: 0.01
+    coff_ent: 5e-4
+    t0: 5.0
+    t1: 1.0
+    undirected: True
+    sample_bias: 0
+  twitter:
+    ex_learning_rate: 0.005
+    ex_epochs: 20
+    coff_size: 0.01
+    coff_ent: 5e-4
+    t0: 5.0
+    t1: 1.0
+    undirected: True
+    sample_bias: 0
+  ba_2motifs:
+    ex_learning_rate: 3e-3
+    ex_epochs: 20
+    coff_size: 0.03
+    coff_ent: 5e-4
+    t0: 5.0
+    t1: 1.0
+    undirected: True
+    sample_bias: 0
+  mutag:
+    ex_learning_rate: 3e-3
+    ex_epochs: 20
+    coff_size: 0.03
+    coff_ent: 5e-4
+    t0: 5.0
+    t1: 1.0
+    undirected: True
+    sample_bias: 0
+  bace:
+    ex_learning_rate: 3e-3
+    ex_epochs: 20
+    coff_size: 0.03
+    coff_ent: 5e-4
+    t0: 5.0
+    t1: 1.0
+    undirected: True
+    sample_bias: 0

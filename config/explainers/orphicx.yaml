@@ -1,0 +1,82 @@
+explainer_name: 'orphicx'
+explanation_result_path: ''
+sparsity: 0.5
+
+param:
+  mutag:
+    ex_learing_rate: 0.05
+    ex_epochs: 20
+    coff_size: 0.01
+    coff_ent: 0.01
+    t0: 5.0
+    t1: 1.0
+    undirected: True
+    batch_size: 128
+    encoder_output: 16
+    patient: 100
+  bbbp:
+    ex_learing_rate: 0.05
+    ex_epochs: 20
+    coff_size: 0.01
+    coff_ent: 0.01
+    t0: 5.0
+    t1: 1.0
+    undirected: True
+    batch_size: 128
+    encoder_output: 16
+    patient: 100
+  ba_shapes:
+    ex_learing_rate: 3e-3
+    ex_epochs: 20
+    coff_size: 0.01
+    coff_ent: 5e-4
+    t0: 5.0
+    t1: 1.0
+    undirected: True
+    batch_size: 128
+    encoder_output: 16
+    patient: 100
+  graph_sst2:
+    ex_learing_rate: 3e-3
+    ex_epochs: 20
+    coff_size: 0.01
+    coff_ent: 5e-4
+    t0: 5.0
+    t1: 1.0
+    undirected: True
+    batch_size: 32
+    encoder_output: 64
+    patient: 30
+  twitter:
+    ex_learing_rate: 0.005
+    ex_epochs: 20
+    coff_size: 0.01
+    coff_ent: 5e-4
+    t0: 5.0
+    t1: 1.0
+    undirected: True
+    batch_size: 32
+    encoder_output: 64
+    patient: 30
+  ba_2motifs:
+    ex_learing_rate: 3e-3
+    ex_epochs: 20
+    coff_size: 0.03
+    coff_ent: 5e-4
+    t0: 5.0
+    t1: 1.0
+    undirected: True
+    batch_size: 128
+    encoder_output: 16
+    patient: 100
+  bace:
+    ex_learing_rate: 0.05
+    ex_epochs: 20
+    coff_size: 0.01
+    coff_ent: 0.01
+    t0: 5.0
+    t1: 1.0
+    undirected: True
+    batch_size: 128
+    encoder_output: 16
+    patient: 100

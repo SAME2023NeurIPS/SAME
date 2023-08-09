@@ -1,0 +1,72 @@
+{
+  "gnn_explainer": {
+    "0.5": {
+      "fidelity": 0.23252114108784705,
+      "sparsity": 0.5059745883779828,
+      "STD of sparsity": 0.009197941205339585,
+      "fidelity_abs": 0.39564668350575416,
+      "STD of fidelity_abs": 0.17861146264374184,
+      "Time in seconds": 42866.29310274124,
+      "Average Time": 19.396512716172506
+    }
+  },
+  "pgexplainer": {
+    "0.5": {
+      "fidelity": 0.2454375730701027,
+      "sparsity": 0.5059745883779828,
+      "STD of sparsity": 0.009197941205339585,
+      "fidelity_abs": 0.4124853330405292,
+      "STD of fidelity_abs": 0.20032448397877212,
+      "Training time": 997.9405801296234,
+      "Time in seconds": 960.6043226718903,
+      "Average Time": 0.43466258944429426
+    }
+  },
+  "gnn_lrp": {
+    "0.5": {
+      "fidelity": 0.19956720024347305,
+      "STD of fidelity": 0.12909829919647467,
+      "sparsity": 0.505109981695811,
+      "STD of sparsity": 0.007835307670584333,
+      "fidelity_abs": 0.33301679097003045,
+      "STD of fidelity_abs": 0.16814501257768572,
+      "Time in seconds": 164.16187286376953,
+      "Average Time": 5.472062428792317
+    }
+  },
+  "grad_cam": {
+    "0.5": {
+      "fidelity": 0.2827617287131688,
+      "sparsity": 0.5059745883779828,
+      "STD of sparsity": 0.009197941205339585,
+      "fidelity_abs": 0.49423062458032524,
+      "STD of fidelity_abs": 0.19308342065566758,
+      "Time in seconds": 977.029797077179,
+      "Average Time": 0.44209493080415335,
+      "accuracy": NaN,
+      "stability": NaN
+    }
+  },
+  "subgraphx": {
+    "5": {
+      "fidelity": 0.2530195261041323,
+      "sparsity": 0.7259079148372014,
+      "STD of sparsity": 0.18763333054590742,
+      "fidelity_abs": 0.4452710678800941,
+      "STD of fidelity_abs": 0.2481236451251759,
+      "Time in seconds": 2139.631375312805,
+      "Average Time": 71.32104584376017
+    }
+  },
+  "same": {
+    "5": {
+      "fidelity": 0.3277813305457433,
+      "sparsity": 0.7890921175479889,
+      "STD of sparsity": 0.13324834077752706,
+      "fidelity_abs": 0.5889273196458816,
+      "STD of fidelity_abs": 0.23683621780487743,
+      "Time in seconds": 265.00754046440125,
+      "Average Time": 8.833584682146709
+    }
+  }
+}

@@ -1,0 +1,126 @@
+{
+  "same": {
+    "5": {
+      "fidelity": 0.5113563617070516,
+      "sparsity": 0.8152727263669173,
+      "STD of sparsity": 0.04765768262735606,
+      "fidelity_abs": 0.5555393779883161,
+      "STD of fidelity_abs": 0.472080297496413,
+      "Time in seconds": 245.6418867111206,
+      "Average Time": 8.188062890370686
+    }
+  },
+  "subgraphx": {
+    "5": {
+      "fidelity": 0.448845570286115,
+      "sparsity": 0.8124675328532854,
+      "STD of sparsity": 0.02006268355674832,
+      "fidelity_abs": 0.48499569383760294,
+      "STD of fidelity_abs": 0.49068850857390034,
+      "Time in seconds": 2566.6606690883636,
+      "Average Time": 85.55535563627879
+    }
+  },
+  "pgexplainer": {
+    "0.7": {
+      "fidelity": 0.3844081831830408,
+      "sparsity": 0.7039826810359955,
+      "STD of sparsity": 0.002683967351913452,
+      "fidelity_abs": 0.3945829301851586,
+      "STD of fidelity_abs": 0.5405174344967042,
+      "Training time": null,
+      "Time in seconds": 6.416095733642578,
+      "Average Time": 0.21386985778808593,
+      "accuracy": NaN,
+      "stability": NaN
+    },
+    "0.8": {
+      "fidelity": 0.3535405141248551,
+      "sparsity": 0.809264063835144,
+      "STD of sparsity": 0.004069268703460693,
+      "fidelity_abs": 0.362942128894257,
+      "STD of fidelity_abs": 0.5403573451708903,
+      "Training time": null,
+      "Time in seconds": 7.514260768890381,
+      "Average Time": 0.2504753589630127,
+      "accuracy": NaN,
+      "stability": NaN
+    },
+    "0.5": {
+      "fidelity": 0.4440815928135999,
+      "sparsity": 0.5065803688764572,
+      "STD of sparsity": 9.718306525944128e-05,
+      "fidelity_abs": 0.4578701390371254,
+      "STD of fidelity_abs": 0.545300323763033,
+      "Training time": 83.36797451972961,
+      "Time in seconds": 12.121855974197388,
+      "Average Time": 0.12121855974197387
+    }
+  },
+  "gnn_explainer": {
+    "0.8": {
+      "fidelity": -0.037886977195739746,
+      "sparsity": 0.8133333325386047,
+      "STD of sparsity": 0.0,
+      "fidelity_abs": -0.03941252557615206,
+      "STD of fidelity_abs": 0.0,
+      "Time in seconds": 1.6605291366577148,
+      "Average Time": 1.6605291366577148
+    },
+    "0.5": {
+      "fidelity": 0.4640420214773621,
+      "sparsity": 0.5065803688764572,
+      "STD of sparsity": 9.718306525944128e-05,
+      "fidelity_abs": 0.4800592909399818,
+      "STD of fidelity_abs": 0.5021863842504729,
+      "Time in seconds": 188.7861385345459,
+      "Average Time": 1.8878613853454589
+    }
+  },
+  "grad_cam": {
+    "0.8": {
+      "fidelity": 0.018368422985076904,
+      "sparsity": 0.8133333325386047,
+      "STD of sparsity": 0.0,
+      "fidelity_abs": 0.019108041714511022,
+      "STD of fidelity_abs": 0.0,
+      "Time in seconds": 1.5928702354431152,
+      "Average Time": 1.5928702354431152,
+      "accuracy": NaN,
+      "stability": NaN
+    },
+    "0.5": {
+      "fidelity": 0.4847973331611138,
+      "sparsity": 0.5065803688764572,
+      "STD of sparsity": 9.718306525944128e-05,
+      "fidelity_abs": 0.5236464433398753,
+      "STD of fidelity_abs": 0.4853378012836078,
+      "Time in seconds": 13.771279335021973,
+      "Average Time": 0.13771279335021971,
+      "accuracy": NaN,
+      "stability": NaN
+    }
+  },
+  "gnn_lrp": {
+    "0.8": {
+      "fidelity": -0.036893606185913086,
+      "STD of fidelity": 0.0,
+      "sparsity": 0.8133333325386047,
+      "STD of sparsity": 0.0,
+      "fidelity_abs": -0.038379155715866566,
+      "STD of fidelity_abs": 0.0,
+      "Time in seconds": 1.728485107421875,
+      "Average Time": 1.728485107421875
+    },
+    "0.5": {
+      "fidelity": 0.4467727058727178,
+      "STD of fidelity": 0.48270689251260934,
+      "sparsity": 0.5065803688764572,
+      "STD of sparsity": 9.718306525944128e-05,
+      "fidelity_abs": 0.4606507609282609,
+      "STD of fidelity_abs": 0.5319535526313727,
+      "Time in seconds": 330.84971952438354,
+      "Average Time": 3.3084971952438353
+    }
+  }
+}

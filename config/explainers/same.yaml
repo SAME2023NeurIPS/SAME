@@ -1,0 +1,102 @@
+explanation_result_dir: 'results/'
+max_ex_size: 5
+sparsity: 0.5
+
+param:
+  bbbp:
+    rollout: 20
+    high2low: True
+    c_puct: 10.0
+    min_atoms: 5
+    expand_atoms: 12
+    local_raduis: 4
+    sample_num: 100
+    reward_method: 'mc_l_shapley'
+    subgraph_building_method: 'split'
+    verbose: True
+    single_explanation_size: 5
+  ba_shapes:
+    rollout: 20
+    high2low: True
+    c_puct: 10.0
+    min_atoms: 5
+    expand_atoms: 20
+    local_raduis: 4
+    sample_num: 100
+    reward_method: 'Nc_mc_l_shapley'
+    subgraph_building_method: 'split'
+    verbose: True
+    single_explanation_size: 5
+  graph_sst2:
+    rollout: 20
+    high2low: False
+    c_puct: 10.0
+    min_atoms: 5
+    expand_atoms: 12
+    local_raduis: 4
+    sample_num: 100
+    reward_method: 'mc_l_shapley'
+    subgraph_building_method: 'split'
+    verbose: True
+    single_explanation_size: 3
+  graph_sst5:
+    rollout: 20
+    high2low: False
+    c_puct: 10.0
+    min_atoms: 5
+    expand_atoms: 12
+    local_raduis: 4
+    sample_num: 100
+    reward_method: 'mc_l_shapley'
+    subgraph_building_method: 'split'
+    verbose: True
+    single_explanation_size: 3
+  twitter:
+    rollout: 20
+    high2low: False
+    c_puct: 5.0
+    min_atoms: 5
+    expand_atoms: 20
+    local_raduis: 4
+    sample_num: 100
+    reward_method: 'mc_l_shapley'
+    subgraph_building_method: 'split'
+    verbose: True
+    single_explanation_size: 3
+  ba_2motifs:
+    rollout: 20
+    high2low: True
+    c_puct: 10.0
+    min_atoms: 5
+    expand_atoms: 20
+    local_raduis: 4
+    sample_num: 100
+    reward_method: 'mc_l_shapley'
+    subgraph_building_method: 'split'
+    verbose: True
+    single_explanation_size: 3
+  mutag:
+    rollout: 20
+    high2low: True
+    c_puct: 10.0
+    min_atoms: 4
+    expand_atoms: 20
+    local_raduis: 5
+    sample_num: 100
+    reward_method: 'mc_l_shapley'
+    subgraph_building_method: 'split'
+    verbose: True
+    single_explanation_size: 2
+  bace:
+    rollout: 20
+    high2low: True
+    c_puct: 10.0
+    min_atoms: 4
+    expand_atoms: 20
+    local_raduis: 5
+    sample_num: 100
+    reward_method: 'mc_l_shapley'
+    subgraph_building_method: 'split'
+    verbose: True
+    single_explanation_size: 2
+

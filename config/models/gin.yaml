@@ -1,0 +1,109 @@
+gnn_saving_dir: 'checkpoints'
+gnn_name: 'gin'
+
+param:
+  mutag:
+    learning_rate: 0.005
+    weight_decay: 0.0
+    milestones: None
+    gamma: None
+    batch_size: 64
+    num_epochs: 800
+    num_early_stop: 100
+    gnn_latent_dim:
+      - 128
+      - 128
+      - 128
+    gnn_dropout: 0
+    add_self_loop: False
+    gnn_emb_normalization: False
+    graph_classification: True
+    node_classification: False
+    readout: 'max'
+    fc_latent_dim: []
+    fc_dropout: 0.0
+    fc_nonlinear: 'relu'
+  graph_sst2:
+    learning_rate: 0.005
+    weight_decay: 0.0
+    milestones: None
+    gamma: None
+    batch_size: 256
+    num_epochs: 800
+    num_early_stop: 100
+    gnn_latent_dim:
+      - 128
+      - 128
+      - 128
+    gnn_dropout: 0
+    add_self_loop: False
+    gnn_emb_normalization: False
+    graph_classification: True
+    node_classification: False
+    readout: 'max'
+    fc_latent_dim: []
+    fc_dropout: 0.0
+    fc_nonlinear: 'relu'
+  graph_sst5:
+    learning_rate: 0.005
+    weight_decay: 0.0
+    milestones: None
+    gamma: None
+    batch_size: 256
+    num_epochs: 800
+    num_early_stop: 100
+    gnn_latent_dim:
+      - 128
+      - 128
+      - 128
+    gnn_dropout: 0
+    add_self_loop: False
+    gnn_emb_normalization: False
+    graph_classification: True
+    node_classification: False
+    readout: 'max'
+    fc_latent_dim: []
+    fc_dropout: 0.0
+    fc_nonlinear: 'relu'
+  bbbp:
+    learning_rate: 0.005
+    weight_decay: 0.0
+    milestones: None
+    gamma: None
+    batch_size: 256
+    num_epochs: 800
+    num_early_stop: 100
+    gnn_latent_dim:
+      - 128
+      - 128
+      - 128
+    gnn_dropout: 0
+    add_self_loop: False
+    gnn_emb_normalization: False
+    graph_classification: True
+    node_classification: False
+    readout: 'max'
+    fc_latent_dim: []
+    fc_dropout: 0.0
+    fc_nonlinear: 'relu'
+  ba_2motifs:
+    learning_rate: 0.005
+    weight_decay: 0.0
+    milestones: None
+    gamma: None
+    batch_size: 256
+    num_epochs: 800
+    num_early_stop: 100
+    gnn_latent_dim:
+      - 128
+      - 128
+      - 128
+    gnn_dropout: 0
+    add_self_loop: False
+    gnn_emb_normalization: False
+    graph_classification: True
+    node_classification: False
+    readout: 'max'
+    fc_latent_dim: []
+    fc_dropout: 0.0
+    fc_nonlinear: 'relu'

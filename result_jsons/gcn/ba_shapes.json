@@ -1,0 +1,61 @@
+{
+  "gnn_lrp": {
+    "0.5": {
+      "fidelity": 0.15464467590763456,
+      "STD of fidelity": 0.34454758744189806,
+      "sparsity": 0.5026163033076695,
+      "STD of sparsity": 0.005587967298542343,
+      "fidelity_abs": 0.2717012571487152,
+      "STD of fidelity_abs": 0.54651298029775,
+      "Time in seconds": 2744.1319692134857,
+      "Average Time": 2744.1319692134857
+    }
+  },
+  "gnn_explainer": {
+    "0.5": {
+      "fidelity": 0.15590675955726988,
+      "sparsity": 0.5026163033076695,
+      "STD of sparsity": 0.005587967298542343,
+      "fidelity_abs": 0.27391722745942476,
+      "STD of fidelity_abs": 0.5444335240371662,
+      "Time in seconds": 114.08000230789185,
+      "Average Time": 2.716190531140282
+    }
+  },
+  "grad_cam": {
+    "0.5": {
+      "fidelity": -0.02116141432807559,
+      "sparsity": 0.5026163033076695,
+      "STD of sparsity": 0.005587967298542343,
+      "fidelity_abs": -0.034445657716405384,
+      "STD of fidelity_abs": 0.13628616969330973,
+      "Time in seconds": 6.329605340957642,
+      "Average Time": 0.15070488907042004,
+      "accuracy": NaN,
+      "stability": NaN
+    }
+  },
+  "pgexplainer": {
+    "0.5": {
+      "fidelity": 0.15436819479579017,
+      "sparsity": 0.5026163033076695,
+      "STD of sparsity": 0.005587967298542343,
+      "fidelity_abs": 0.2706201102904465,
+      "STD of fidelity_abs": 0.5430331921901979,
+      "Training time": 299.3857913017273,
+      "Time in seconds": 5.378265619277954,
+      "Average Time": 0.12805394331614176
+    }
+  },
+  "same": {
+    "5": {
+      "fidelity": 2.9862791271436784,
+      "fidelity_inv": 0.48854806309654597,
+      "h_fidelity": 0.6948329305106455,
+      "sparsity": 0.6310773379213753,
+      "fidelity_abs": 0.5346852306173657,
+      "Time in seconds": 7161.571125030518,
+      "Average Time": 170.51359821501234
+    }
+  }
+}

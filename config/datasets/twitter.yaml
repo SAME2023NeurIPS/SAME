@@ -1,0 +1,5 @@
+dataset_root: '/mnt/repo3/Rihan/multi_subgraph/datasets'
+dataset_name: 'twitter'
+random_split_flag: False
+data_split_ratio: None
+seed: 2

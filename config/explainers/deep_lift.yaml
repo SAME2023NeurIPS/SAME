@@ -1,0 +1,16 @@
+explanation_result_dir: ''
+sparsity: 0.8
+
+param:
+  bbbp:
+    none: None
+  graph_sst2:
+    none: None
+  graph_sst5:
+    none: None
+  twitter:
+    none: None
+  ba_shapes:
+    none: None
+  ba_2motifs:
+    none: None
