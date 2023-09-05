@@ -71,8 +71,17 @@ def pipeline(config):
         train_indices = loader["train"].dataset.indices
         test_indices = loader["test"].dataset.indices
 
-        if config.datasets.data_explain_cutoff > 0:
-            test_indices = test_indices[: config.datasets.data_explain_cutoff]
+        # if config.datasets.data_explain_cutoff > 0:
+        #     test_indices = test_indices[: config.datasets.data_explain_cutoff]
+        # TODO: Partial
+        import random
+        random.seed(config.datasets.seed)
+        random.shuffle(test_indices)
+        if 'graph_sst' in config.datasets.dataset_name.lower():
+            print('Using 30 data instances only...')
+            test_indices = sorted(test_indices, key=lambda x: dataset[x].num_nodes, reverse=True)
+            test_indices = [x for x in test_indices if dataset[x].num_nodes == 16]
+            test_indices = test_indices[10:40]
 
     else:
         train_indices = range(len(dataset))

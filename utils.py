@@ -2,7 +2,10 @@ import json
 import os
 from abc import ABC
 from collections import Counter
-
+import pytz
+import logging
+import copy
+from datetime import datetime
 import numpy as np
 import networkx as nx
 import rdkit.Chem as Chem
@@ -12,23 +15,29 @@ from textwrap import wrap
 import random
 import numpy as np
 import torch
-
-from mcts import reward_func, MCTSNode
+from methods.initialization_mcts import reward_func, MCTSNode
+from methods.exploration_mcts import exploration_MCTS
 from shapley import GnnNets_GC2value_func, GnnNets_NC2value_func
+from torch_geometric.utils import subgraph, to_dense_adj, k_hop_subgraph
+from torch_geometric.data import Data, Batch, Dataset, DataLoader
+
+# For associated game
+from itertools import combinations
+from scipy.sparse.csgraph import connected_components as cc
+
 
 
 def find_closest_node_result(results, max_nodes=5, **kwargs):
     """ return the highest reward graph node constraining to the subgraph size """
-    single_explanation_size = kwargs.get('config').explainers.param.single_explanation_size
-    # single_explanation_size = max_nodes
+    gamma = kwargs.get('config').explainers.param.single_explanation_size
     g = results[0].ori_graph
     b = results[0].P
     data = kwargs.get('data')
     # result_node = []
-    _results = [tmp for tmp in results if len(tmp.coalition) <= single_explanation_size]
+    _results = [tmp for tmp in results if len(tmp.coalition) <= gamma]
     results = _results if len(_results) > 0 else results[0]
     results = sorted(results, key=lambda x: x.P, reverse=True)
-    K = 7
+    K = kwargs.get('config').explainers.param.candidate_size
     max_i = min(K, len(results))
     
     if kwargs.get('config').models.param.graph_classification:
@@ -38,28 +47,38 @@ def find_closest_node_result(results, max_nodes=5, **kwargs):
         value_func = GnnNets_NC2value_func(kwargs.get('gnnNets'), target_class=kwargs.get('target_class'), node_idx=kwargs.get('node_idx'))
         score_func = reward_func(kwargs.get('config').explainers.param, value_func)
     
+    method = kwargs.get('config').explainers.param.explanation_exploration_method
+    if method.lower() == 'permutation':
+        def dfs(coalition: list, current, num_of_g=0):
+            num_of_g = num_of_g + 1
+            co = coalition # list(set(coalition))
+            if len(co) > max_nodes:
+                return
+            if num_of_g >= 2:
+                n = MCTSNode(co, data=data, ori_graph=g)
+                n.P = score_func(n.coalition, data)
+                results.append(n)
+                # return
+            for i in range(current, max_i):
+                tmp = coalition.copy()
+                tmp.extend(results[i].coalition)
+                tmp = list(set(tmp))
+                if Counter(co) == Counter(tmp):
+                    continue
+                dfs(tmp, i+1, num_of_g)
+            pass
 
-    def dfs(coalition: list, current, num_of_g=0):
-        num_of_g = num_of_g + 1
-        co = coalition # list(set(coalition))
-        if len(co) > max_nodes:
-            return
-        if num_of_g >= 2:
-            n = MCTSNode(co, data=data, ori_graph=g)
-            n.P = score_func(n.coalition, data)
-            results.append(n)
-            # return
-        for i in range(current, max_i):
-            tmp = coalition.copy()
-            tmp.extend(results[i].coalition)
-            tmp = list(set(tmp))
-            if Counter(co) == Counter(tmp):
-                continue
-            dfs(tmp, i+1, num_of_g)
+        dfs([], 0)
+        results = sorted(results, key=lambda x: x.P, reverse=True)
+    elif method.lower() == 'mcts':
+        mcts_state_map = exploration_MCTS(data.x, data.edge_index, results[:max_i]
+                                          score_func=score_func,
+                                          n_rollout=10,
+                                          explanation_size=max_nodes, 
+                                          c_puct=config.explainers.param.c_puct)
+        results = mcts_state_map.mcts(verbose=True)
         pass
-
-    dfs([], 0)
-    results = sorted(results, key=lambda x: x.P, reverse=True)
+    
     result_node = results[0]
     return result_node
 

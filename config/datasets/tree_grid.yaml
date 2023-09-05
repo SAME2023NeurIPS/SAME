@@ -1,2 +1,2 @@
-dataset_root: '/tmp/datasets'
+dataset_root: 'datasets'
 dataset_name: 'tree_grid'

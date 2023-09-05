@@ -4,8 +4,8 @@ import time
 import hydra
 from omegaconf import OmegaConf
 from tqdm import tqdm
-from gstarx import GStarX
-from dataset import get_dataset, get_dataloader
+from methods.gstarx import GStarX
+from load_dataset import get_dataset, get_dataloader
 from gnnNets import get_gnnNets
 from utils import check_dir, get_logger, evaluate_scores_list, PlotUtils
 
@@ -67,7 +67,6 @@ def main(config):
         test_indices = sorted(test_indices, key=lambda x: dataset[x].num_nodes, reverse=True)
         test_indices = [x for x in test_indices if dataset[x].num_nodes == 16]
         test_indices = test_indices[10:40]
-    # test_indices = test_indices[:30]
 
     # Load model
     model = get_gnnNets(

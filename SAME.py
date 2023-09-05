@@ -10,7 +10,7 @@ from torch_geometric.utils import add_remaining_self_loops, remove_self_loops
 from tqdm import tqdm
 from gnnNets import get_gnnNets
 from load_dataset import get_dataset, get_dataloader
-from mcts import MCTS, reward_func
+from SAME.methods.initialization_mcts import MCTS, reward_func
 from torch_geometric.data import Batch
 from shapley import GnnNets_GC2value_func, gnn_score
 from utils import PlotUtils, find_closest_node_result, Recorder, eval_metric, fidelity_normalize_and_harmonic_mean
@@ -74,7 +74,7 @@ def pipeline(config):
     if not os.path.isdir(save_dir):
         os.mkdir(save_dir)
     
-    fidelity_score_list = []
+    abs_fidelity_score_list = []
     sparsity_score_list = []
     ori_fide_list = []
     inv_fide_list = []
@@ -148,27 +148,27 @@ def pipeline(config):
 
         sparsity_score = sparsity(graph_node_exist, graph_node_x, config.explainers.param.subgraph_building_method)
 
-        fidelity_score, eval_score = eval_metric(original_score, maskout_score, sparsity_score)
-        ori_fide = original_score - maskout_score
-        ori_fide_list.append(ori_fide.item())
-        fidelity_score_list.append(fidelity_score)
+        abs_fidelity_score, eval_score = eval_metric(original_score, maskout_score, sparsity_score)
+        ori_fide = (original_score - maskout_score).item()
+        ori_fide_list.append(ori_fide)
+        abs_fidelity_score_list.append(abs_fidelity_score)
         sparsity_score_list.append(sparsity_score)
        
-        inv_f = original_score - masked_score
-        inv_fide_list.append(inv_f.item())
+        inv_f = (original_score - masked_score).item()
+        inv_fide_list.append(inv_f)
         _, _, h_f = fidelity_normalize_and_harmonic_mean(ori_fide, inv_f, sparsity_score)
-        h_fides.append(h_f.item())
+        h_fides.append(h_f)
         
         # visualization
         if hasattr(dataset, 'supplement'):
             words = dataset.supplement['sentence_tokens'][str(i)]
             plotutils.plot(mcts_state_map.graph, graph_node_exist, words=words,
                            figname=os.path.join(save_dir, f"example_{i}.png"),
-                           title_sentence=f'fidelity: {fidelity_score:.4f}, sparsity: {sparsity_score:.4f}')
+                           title_sentence=f'fidelity: {ori_fide:.4f}, sparsity: {sparsity_score:.4f}')
         else:
             plotutils.plot(mcts_state_map.graph, graph_node_exist, x=graph_node_x.x,
                            figname=os.path.join(save_dir, f"example_{i}.png"),
-                           title_sentence=f'fidelity: {fidelity_score:.4f}, sparsity: {sparsity_score:.4f}')
+                           title_sentence=f'fidelity: {ori_fide:.4f}, sparsity: {sparsity_score:.4f}')
             
 
     end_time = time.time()
@@ -178,8 +178,8 @@ def pipeline(config):
         'h_fidelity': np.mean(h_fides),
         'sparsity': np.mean(sparsity_score_list),
         'STD of sparsity': np.std(sparsity_score_list),
-        'fidelity_abs': np.mean(fidelity_score_list),
-        'STD of fidelity_abs': np.std(fidelity_score_list),
+        'fidelity_abs': np.mean(abs_fidelity_score_list),
+        'STD of fidelity_abs': np.std(abs_fidelity_score_list),
         'Time in seconds': end_time - start_time,
         'Average Time': (end_time - start_time)/len(data_indices)
     }
@@ -189,10 +189,8 @@ def pipeline(config):
 
     recorder.save()
 
-    fidelity_scores = torch.tensor(fidelity_score_list)
+    fidelity_scores = torch.tensor(ori_fide_list)
     sparsity_scores = torch.tensor(sparsity_score_list)
-    print(np.mean(ori_fide_list))
-    print(np.mean(sparsity_scores.detach().numpy()))
     
     return fidelity_scores, sparsity_scores
 

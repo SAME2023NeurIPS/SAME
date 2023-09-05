@@ -115,8 +115,6 @@ def pipeline(config):
     config.explainers.param = config.explainers.param[config.datasets.dataset_name]
     config.explainers.sparsity = config.sparsity
     config.models.param.add_self_loop = False
-    if config.models.gnn_name.lower() == 'gat':
-        config.models.param.concate = True
         
     if not os.path.isdir(config.record_filename):
         os.makedirs(config.record_filename)
@@ -146,10 +144,10 @@ def pipeline(config):
             test_indices = list(range(len(dataset)))
         # TODO: Partial
         import random
-        print('Using 30 data instances only...')
         random.seed(config.datasets.seed)
         random.shuffle(test_indices)
-        if config.datasets.dataset_name.lower() == 'graph_sst2':
+        if 'graph_sst' in config.datasets.dataset_name.lower():
+            print('Using 30 data instances only...')
             test_indices = sorted(test_indices, key=lambda x: dataset[x].num_nodes, reverse=True)
             test_indices = [x for x in test_indices if dataset[x].num_nodes == 16]
             test_indices = test_indices[10:40]
@@ -257,21 +255,7 @@ def pipeline(config):
             if hasattr(dataset, "supplement"):
                 words = dataset.supplement["sentence_tokens"][str(test_indices[i])]
             else:
-                words = None
-            
-            # mask = hard_edge_masks[prediction].clone().detach().cpu()
-            # edge_index, edge_attr = remove_self_loops(data.edge_index.clone().cpu(), mask)
-            # edge_index, edge_attr = to_undirected(edge_index, edge_attr)
-            
-            # edge_indices = torch.nonzero(torch.tensor(edge_attr), as_tuple=False).t()
-            
-            # edge_indices = torch.tensor(edge_indices,dtype=torch.long)
-            # node_mask = torch.unique(edge_index[:, edge_indices].flatten())
-            
-            # node_list = [x.item() for x in node_mask]
-            # plotutils.plot(to_networkx(data, remove_self_loops=True), node_list, words=words, x=data.x,
-            #                figname=os.path.join(explanation_saving_dir, f"example_{test_indices[i]}.png"),
-            #                title_sentence=None)           
+                words = None         
             
             idx = test_indices[i]
             related_preds = related_preds[prediction]
@@ -294,17 +278,6 @@ def pipeline(config):
             explained_example_plot_path = os.path.join(
                 explanation_saving_dir, f"example_{idx}.png"
             )
-            # coalition = hard_edge_masks2coalition(
-            #     data, hard_edge_masks, config.models.param.add_self_loop
-            # )
-            # plotutils.plot(
-            #     to_networkx(data, remove_self_loops=True),
-            #     coalition,
-            #     x=data.x,
-            #     words=words,
-            #     title_sentence=title_sentence,
-            #     figname=explained_example_plot_path,
-            # )
 
             fide, score = eval_metric(related_preds["origin"], related_preds["maskout"], related_preds["sparsity"])
             fides_abs.append(fide)
@@ -377,9 +350,6 @@ def pipeline(config):
             spars.append(related_preds[predictions[node_idx].item()]["sparsity"])
 
     end_time = time.time()
-    # print(f'Fidelity: {x_collector.fidelity:.4f}\n'
-    #       f'Fidelity_inv: {x_collector.fidelity_inv: .4f}\n'
-    #       f'Sparsity: {x_collector.sparsity:.4f}')
 
     experiment_data = {
         'fidelity': np.mean(fides_ori),

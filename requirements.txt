@@ -1,0 +1,12 @@
+dgl==0.9.1
+dgllife==0.3.0
+dive-into-graphs==1.0.0
+hydra-core==1.2.0
+matplotlib==3.5.2
+networkx==2.8.4
+numpy==1.23.1
+pytz==2022.1
+PyYAML==6.0
+torch==1.12.1
+torch-geometric==2.1.0.post1
+tqdm==4.64.1

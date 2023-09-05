@@ -9,7 +9,7 @@ import numpy as np
 import time
 from gnnNets import get_gnnNets
 from load_dataset import get_dataset, get_dataloader
-from fornode.mcts import MCTS, reward_func
+from SAME.methods.initialization_mcts_for_node import MCTS, reward_func
 from shapley import gnn_score, GnnNets_NC2value_func
 from torch_geometric.utils import to_networkx, add_remaining_self_loops
 from utils import PlotUtils, find_closest_node_result, eval_metric, Recorder, fidelity_normalize_and_harmonic_mean
@@ -63,7 +63,7 @@ def pipeline(config):
         os.mkdir(save_dir)
 
     plotutils = PlotUtils(dataset_name=config.datasets.dataset_name)
-    fidelity_score_list = []
+    abs_fidelity_score_list = []
     sparsity_score_list = []
     ori_fide_list = []
     fidelity_inv = []
@@ -127,8 +127,8 @@ def pipeline(config):
         # sparsity_score = 1 - len(tree_node_x.coalition)/tree_node_x.ori_graph.number_of_nodes()
         sparsity_score = sparsity(tree_node_x.coalition, tree_node_x.data, config.explainers.param.subgraph_building_method)
 
-        fidelity_score, eval_score = eval_metric(original_score, maskout_score, sparsity_score)
-        fidelity_score_list.append(fidelity_score)
+        abs_fidelity_score, eval_score = eval_metric(original_score, maskout_score, sparsity_score)
+        abs_fidelity_score_list.append(abs_fidelity_score)
         sparsity_score_list.append(sparsity_score)
         ori_fide = original_score - maskout_score
         ori_fide_list.append(ori_fide)
@@ -151,7 +151,7 @@ def pipeline(config):
         'fidelity_inv': np.mean(fidelity_inv),
         'h_fidelity': np.mean(h_fides),
         'sparsity': sum(sparsity_score_list) / len(sparsity_score_list),
-        'fidelity_abs': sum(fidelity_score_list) / len(fidelity_score_list),
+        'fidelity_abs': sum(abs_fidelity_score_list) / len(abs_fidelity_score_list),
         'Time in seconds': end_time - start_time,
         'Average Time': (end_time - start_time)/len(node_indices)
     }
@@ -161,7 +161,7 @@ def pipeline(config):
 
     recorder.save()
 
-    fidelity_scores = torch.tensor(fidelity_score_list)
+    fidelity_scores = torch.tensor(ori_fide_list)
     sparsity_scores = torch.tensor(sparsity_score_list)
     print(f"fidelity score: {fidelity_scores.mean().item()}, sparsity score: {sparsity_scores.mean().item()}")
     return fidelity_scores, sparsity_scores

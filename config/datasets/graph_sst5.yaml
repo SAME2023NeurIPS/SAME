@@ -1,4 +1,4 @@
-dataset_root: '/mnt/repo3/Rihan/multi_subgraph/datasets'
+dataset_root: 'datasets'
 dataset_name: 'graph_sst5'
 random_split_flag: False
 data_split_ratio: None

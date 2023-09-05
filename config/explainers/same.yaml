@@ -15,6 +15,8 @@ param:
     subgraph_building_method: 'split'
     verbose: True
     single_explanation_size: 5
+    candidate_size: 7
+    explanation_exploration_method: 'permutation'
   ba_shapes:
     rollout: 20
     high2low: True
@@ -27,6 +29,8 @@ param:
     subgraph_building_method: 'split'
     verbose: True
     single_explanation_size: 5
+    candidate_size: 7
+    explanation_exploration_method: 'permutation'
   graph_sst2:
     rollout: 20
     high2low: False
@@ -39,6 +43,8 @@ param:
     subgraph_building_method: 'split'
     verbose: True
     single_explanation_size: 3
+    candidate_size: 7
+    explanation_exploration_method: 'permutation'
   graph_sst5:
     rollout: 20
     high2low: False
@@ -51,6 +57,8 @@ param:
     subgraph_building_method: 'split'
     verbose: True
     single_explanation_size: 3
+    candidate_size: 7
+    explanation_exploration_method: 'permutation'
   twitter:
     rollout: 20
     high2low: False
@@ -63,6 +71,8 @@ param:
     subgraph_building_method: 'split'
     verbose: True
     single_explanation_size: 3
+    candidate_size: 7
+    explanation_exploration_method: 'permutation'
   ba_2motifs:
     rollout: 20
     high2low: True
@@ -75,6 +85,8 @@ param:
     subgraph_building_method: 'split'
     verbose: True
     single_explanation_size: 3
+    candidate_size: 7
+    explanation_exploration_method: 'permutation'
   mutag:
     rollout: 20
     high2low: True
@@ -87,6 +99,8 @@ param:
     subgraph_building_method: 'split'
     verbose: True
     single_explanation_size: 2
+    candidate_size: 7
+    explanation_exploration_method: 'permutation'
   bace:
     rollout: 20
     high2low: True
@@ -99,4 +113,5 @@ param:
     subgraph_building_method: 'split'
     verbose: True
     single_explanation_size: 2
-
+    candidate_size: 7
+    explanation_exploration_method: 'permutation'

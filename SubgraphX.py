@@ -33,7 +33,7 @@ def pipeline(config):
     print(OmegaConf.to_yaml(config))
     recorder = Recorder(config.record_filename)
 
-    fides = []
+    abs_fides = []
     fides_ori = []
     spars = []
     h_f_list = []
@@ -138,7 +138,7 @@ def pipeline(config):
             fo = torch.tensor(related_preds["origin"]) - torch.tensor(related_preds["maskout"])
             inv_f = torch.tensor(related_preds["origin"]) - torch.tensor(related_preds["masked"])
             fides_ori.append(fo.item())
-            fides.append(f)
+            abs_fides.append(f)
             spars.append(spar)
             
             _, _, h_f = fidelity_normalize_and_harmonic_mean(fo.item(), inv_f.item(), spar)
@@ -234,7 +234,7 @@ def pipeline(config):
                              f'spar: {spar:.4f}, ' \
                              f'score: {score:.4f}, gnn: {related_preds["origin"]:.4f}'
             fides_ori.append(fo)
-            fides.append(f)
+            abs_fides.append(f)
             spars.append(spar)
             
             _, _, h_f = fidelity_normalize_and_harmonic_mean(fo.item(), inv_f.item(), spar)
@@ -263,8 +263,8 @@ def pipeline(config):
         'h_fidelity': np.mean(h_f_list),
         'sparsity': np.mean(spars),
         'STD of sparsity': np.std(spars),
-        'fidelity_abs': np.mean(fides),
-        'STD of fidelity_abs': np.std(fides),
+        'fidelity_abs': np.mean(abs_fides),
+        'STD of fidelity_abs': np.std(abs_fides),
         'Time in seconds': end_time - start_time,
         'Average Time': (end_time - start_time)/len(test_indices)
     }

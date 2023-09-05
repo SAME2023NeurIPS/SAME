@@ -26,7 +26,7 @@ def pipeline(config):
         os.makedirs(config.record_filename)
     config.record_filename = os.path.join(config.record_filename, f"{config.datasets.dataset_name}.json")
     print(OmegaConf.to_yaml(config))
-    # fix_random_seed(config.random_seed)
+
     recorder = Recorder(config.record_filename)
 
     if torch.cuda.is_available():
@@ -50,10 +50,10 @@ def pipeline(config):
             test_indices = list(range(len(dataset)))
         # TODO: Partial
         import random
-        print('Using 30 data instances only...')
         random.seed(config.datasets.seed)
         random.shuffle(test_indices)
-        if config.datasets.dataset_name.lower() == 'graph_sst2':
+        if 'graph_sst' in config.datasets.dataset_name.lower():
+            print('Using 30 data instances only...')
             test_indices = sorted(test_indices, key=lambda x: dataset[x].num_nodes, reverse=True)
             test_indices = [x for x in test_indices if dataset[x].num_nodes == 16]
             test_indices = test_indices[10:40]

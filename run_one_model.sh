@@ -4,19 +4,18 @@
 
 explainer=$1
 dataset_name=$2
-max_ex_size=$3
-sparsity=$4
-model_name=$5
+sparsity=$3
+model_name=$4
 
-if [ "$explainer" = "subgraphX" ]; then
+if [ "$explainer" = "subgraphx" ]; then
     echo ">>>> Explainer: $explainer, Dataset: $dataset_name, GNN: $model_name Sparsity: $sparsity"
     python SubgraphX.py models="$model_name" datasets="$dataset_name" \
-    sparsity=$sparsity max_ex_size=$max_ex_size
+    sparsity=$sparsity
 elif [ "$explainer" = "same" ]; then
     echo ">>>> Explainer: $explainer, Dataset: $dataset_name, Sparsity: $sparsity"
     if  [ "$dataset_name" = "ba_shapes" ]; then
         python SAME_for_node.py models="$model_name" datasets="$dataset_name" \
-        sparsity=$sparsity max_ex_size=$max_ex_size
+        sparsity=$sparsity
     else
         python SAME.py models="$model_name"
     fi
