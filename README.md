@@ -99,10 +99,9 @@ SAME exactly find the ground-truth explanation (a 5-node-house-structure motif) 
 </p>
 
 
-## Reference
+## Acknowledgement
 
-The baseline methods of our code are borrowed from the following repositories. We acknowledge their implementations. 
-
+The baseline methods of our code are borrowed and adapted from the following repositories.
 https://github.com/ShichangZh/GStarX
 
 https://github.com/divelab/DIG/tree/main/dig/xgraph
