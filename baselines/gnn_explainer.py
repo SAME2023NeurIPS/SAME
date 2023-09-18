@@ -8,7 +8,7 @@ from sklearn.metrics import roc_auc_score
 import time
 from gnnNets import get_gnnNets
 from load_dataset import get_dataset, get_dataloader
-from utils import check_dir, fix_random_seed, Recorder, perturb_input, eval_metric, PlotUtils, to_networkx
+from utils import check_dir, fix_random_seed, Recorder, perturb_input, eval_metric, PlotUtils, to_networkx, fidelity_normalize_and_harmonic_mean
 
 from dig.xgraph.method import GNNExplainer
 from dig.xgraph.evaluation import XCollector
@@ -16,7 +16,7 @@ from dig.xgraph.utils.compatibility import compatible_state_dict
 from torch_geometric.utils import add_remaining_self_loops, remove_self_loops, to_undirected
 IS_FRESH = False
 
-@hydra.main(config_path="config", config_name="config")
+@hydra.main(config_path="../config", config_name="config")
 def pipeline(config):
     config.models.param = config.models.param[config.datasets.dataset_name]
     config.explainers.param = config.explainers.param[config.datasets.dataset_name]
@@ -48,7 +48,7 @@ def pipeline(config):
         test_indices = loader['test'].dataset.indices
         if config.datasets.dataset_name == 'mutag':
             test_indices = list(range(len(dataset)))
-        # TODO: Partial
+
         import random
         random.seed(config.datasets.seed)
         random.shuffle(test_indices)
@@ -57,6 +57,7 @@ def pipeline(config):
             test_indices = sorted(test_indices, key=lambda x: dataset[x].num_nodes, reverse=True)
             test_indices = [x for x in test_indices if dataset[x].num_nodes == 16]
             test_indices = test_indices[10:40]
+            
     else:
         node_indices_mask = (dataset.data.y != 0) * dataset.data.test_mask
         node_indices = torch.where(node_indices_mask)[0]
@@ -75,6 +76,8 @@ def pipeline(config):
 
     fides_abs = []
     fides_ori = []
+    inv_fide_list = []
+    h_fides = []
     spars = []
     scores = []
 
@@ -151,18 +154,27 @@ def pipeline(config):
             node_list = [x.item() for x in node_mask]
             
             x_collector.collect_data(hard_edge_masks, related_preds, label=prediction)
-            fide, score = eval_metric(related_preds[prediction]["origin"], related_preds[prediction]["maskout"],
-                                      related_preds[prediction]["sparsity"])
-            fides_abs.append(fide)
-            fides_ori.append(related_preds[prediction]["origin"] - related_preds[prediction]["maskout"])
+            abs_fide, score = eval_metric(related_preds[prediction]["origin"], related_preds[prediction]["maskout"],
+                                          related_preds[prediction]["sparsity"])
+            inv_f = related_preds[prediction]["origin"] - related_preds[prediction]["masked"]
+            ori_f = related_preds[prediction]["origin"] - related_preds[prediction]["maskout"]
+            sp = related_preds[prediction]["sparsity"]
+
+            fides_abs.append(abs_fide)
+            fides_ori.append(ori_f)
+            inv_fide_list.append(inv_f)
+            _, _, h_f = fidelity_normalize_and_harmonic_mean(ori_f, inv_f, sp)
+            h_fides.append(h_f)
+
             scores.append(score)
-            spars.append(related_preds[prediction]["sparsity"])
+            spars.append(sp)
             
             title_sentence = f'fide: {fides_ori[-1]:.4f}, spar: {spars[-1]:.4f}'
             
-            plotutils.plot(to_networkx(data, remove_self_loops=True), node_list, words=words, x=data.x.detach(),
-                           figname=os.path.join(explanation_saving_dir, f"example_{test_indices[i]}.png"),
-                           title_sentence=title_sentence)
+            if config.save_plot:
+                plotutils.plot(to_networkx(data, remove_self_loops=True), node_list, words=words, x=data.x.detach(),
+                            figname=os.path.join(explanation_saving_dir, f"example_{test_indices[i]}.png"),
+                            title_sentence=title_sentence)
 
     else:
         data = dataset.data
@@ -191,24 +203,31 @@ def pipeline(config):
             torch.save(edge_masks, os.path.join(explanation_saving_dir, f'example_{node_idx}.pt'))
 
             x_collector.collect_data(edge_masks, related_preds, label=prediction[node_idx].item())
-            fide, score = eval_metric(related_preds[prediction[node_idx].item()]["origin"],
+            abs_fide, score = eval_metric(related_preds[prediction[node_idx].item()]["origin"],
                                       related_preds[prediction[node_idx].item()]["maskout"],
                                       related_preds[prediction[node_idx].item()]["sparsity"])
-            fides_abs.append(fide)
-            fides_ori.append(
-                related_preds[prediction[node_idx].item()]["origin"] - related_preds[prediction[node_idx].item()][
-                    "maskout"])
+            
+            inv_f = related_preds[prediction[node_idx].item()]["origin"] - related_preds[prediction[node_idx].item()]["masked"]
+            ori_f = related_preds[prediction[node_idx].item()]["origin"] - related_preds[prediction[node_idx].item()]["maskout"]
+            sp = related_preds[prediction[node_idx].item()]["sparsity"]
+
+            fides_abs.append(abs_fide)
+            fides_ori.append(ori_f)
+            inv_fide_list.append(inv_f)
+            _, _, h_f = fidelity_normalize_and_harmonic_mean(ori_f, inv_f, sp)
+            h_fides.append(h_f)
+            fides_abs.append(ori_f)
             scores.append(score)
-            spars.append(related_preds[prediction[node_idx].item()]["sparsity"])
+            spars.append(sp)
 
     end_time = time.time()
 
     experiment_data = {
         'fidelity': np.mean(fides_ori),
+        'inv_fidelity': np.mean(inv_fide_list),
+        'h_fidelity': np.mean(h_fides),
         'sparsity': np.mean(spars),
-        'STD of sparsity': np.std(spars),
-        'fidelity_abs': np.mean(fides_abs),
-        'STD of fidelity_abs': np.std(fides_abs),
+        'STD of sparsity': np.std(spars),       
         'Time in seconds': end_time - start_time,
         'Average Time': (end_time - start_time)/len(test_indices)
     }

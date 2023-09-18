@@ -1,5 +1,6 @@
 import os
 import sys
+import time
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -12,12 +13,12 @@ from tqdm import tqdm
 from torch import nn, optim
 from torch_geometric.utils import dense_to_sparse
 from omegaconf import OmegaConf
-from dataset import get_dataset, get_dataloader
+from ..load_dataset import get_dataset, get_dataloader
 from gnnNets import get_gnnNets
-from utils import check_dir, get_logger, PlotUtils
+from utils import check_dir, get_logger, PlotUtils, Recorder
 from baselines.baselines_utils import evaluate_related_preds_list
-from baselines.methods import VGAE3MLP, Orphicx, causaleffect
-from baselines.methods.orphicx import (
+from methods import VGAE3MLP, Orphicx, causaleffect
+from methods.orphicx import (
     gaeloss,
     get_orphicx_default_args,
     dense_to_sparse_batch,
@@ -26,8 +27,6 @@ from baselines.methods.orphicx import (
 )
 
 IS_FRESH = False
-# IS_FRESH = True
-
 
 @hydra.main(config_path="../config", config_name="config")
 def pipeline(config):
@@ -36,18 +35,19 @@ def pipeline(config):
     config.datasets.dataset_root = os.path.join(pwd, "datasets")
     config.models.gnn_saving_path = os.path.join(pwd, "checkpoints")
     config.explainers.explanation_result_path = os.path.join(cwd, "results")
-    config.log_path = os.path.join(cwd, "log")
 
+    if not os.path.isdir(config.record_filename):
+        os.makedirs(config.record_filename)
+    config.record_filename = os.path.join(config.record_filename, f"{config.datasets.dataset_name}.json")
+
+    recorder = Recorder(config.record_filename)
+   
     config.models.param = config.models.param[config.datasets.dataset_name]
     config.explainers.param = config.explainers.param[config.datasets.dataset_name]
     config.explainers.sparsity = float(config.sparsity)
 
     explainer_name = config.explainers.explainer_name
-    log_file = (
-        f"{explainer_name}_{config.datasets.dataset_name}_{config.models.gnn_name}.log"
-    )
-    logger = get_logger(config.log_path, log_file, config.console_log, config.log_level)
-    logger.debug(OmegaConf.to_yaml(config))
+    
 
     if torch.cuda.is_available() and config.device_id >= 0:
         device = torch.device("cuda", index=config.device_id)
@@ -73,7 +73,7 @@ def pipeline(config):
 
         # if config.datasets.data_explain_cutoff > 0:
         #     test_indices = test_indices[: config.datasets.data_explain_cutoff]
-        # TODO: Partial
+
         import random
         random.seed(config.datasets.seed)
         random.shuffle(test_indices)
@@ -93,7 +93,6 @@ def pipeline(config):
         "orphicx_processed_dataset.pt",
     )
     if os.path.isfile(orphicx_data_saving_path):
-        logger.info("Loading processed dataset")
         processed_dataset = torch.load(
             orphicx_data_saving_path, map_location=torch.device("cpu")
         )
@@ -193,11 +192,11 @@ def pipeline(config):
     )
     optimizer = optim.Adam(orphicx.explainer.parameters(), lr=args.lr)
     criterion = gaeloss
+    start_time = time.time()
 
     """Training"""
     orphicx_saving_path = os.path.join(explanation_saving_path, f"{explainer_name}.pth")
     if not IS_FRESH and os.path.isfile(orphicx_saving_path):
-        logger.info("Loading saved orphicx model...")
         state_dict = torch.load(orphicx_saving_path, map_location=torch.device("cpu"))
         orphicx.load_state_dict(state_dict)
     else:
@@ -311,12 +310,10 @@ def pipeline(config):
                     torch.save(orphicx.state_dict(), orphicx_saving_path)
                     patient = args.patient
                 elif patient <= 0:
-                    logger.info("Early stopping!")
+                    print("Early stopping!")
                     break
 
-                logger.info(
-                    f"train_loss: {np.array(loss.item()).round(5)}, val_loss: {np.array(val_loss).round(5)}"
-                )
+                print(f"train_loss: {np.array(loss.item()).round(5)}, val_loss: {np.array(val_loss).round(5)}")
 
         state_dict = torch.load(orphicx_saving_path)
         orphicx.load_state_dict(state_dict)
@@ -346,7 +343,6 @@ def pipeline(config):
         related_preds_list += [related_preds]
 
         if config.save_plot:
-            logger.debug(f"Plotting example {idx}.")
             from utils import fidelity_normalize_and_harmonic_mean, to_networkx
             from baselines.baselines_utils import hard_edge_masks2coalition
 
@@ -376,9 +372,24 @@ def pipeline(config):
                 figname=explained_example_plot_path,
             )
 
-    metrics = evaluate_related_preds_list(related_preds_list, logger)
-    metrics_str = ",".join([f"{m : .4f}" for m in metrics])
-    print(metrics_str)
+    end_time = time.time()
+    metrics = evaluate_related_preds_list(related_preds_list)
+    sp_mean, f_mean, inv_f_mean, n_f_mean, n_inv_f_mean, h_f_mean = metrics
+    # metrics_str = ",".join([f"{m : .4f}" for m in metrics])
+    # print(metrics_str)
+    experiment_data = {
+        'fidelity': f_mean,
+        'fidelity_inv': inv_f_mean,
+        'h_fidelity': h_f_mean,
+        'sparsity': sp_mean,
+        'Time in seconds': end_time - start_time,
+        'Average Time': (end_time - start_time)/len(test_indices)
+    }
+    
+    recorder.append(experiment_settings=['gstarx', f"{config.explainers.sparsity}"],
+                    experiment_data=experiment_data)
+
+    recorder.save()
 
 
 if __name__ == "__main__":

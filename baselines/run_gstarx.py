@@ -7,29 +7,36 @@ from tqdm import tqdm
 from methods.gstarx import GStarX
 from load_dataset import get_dataset, get_dataloader
 from gnnNets import get_gnnNets
-from utils import check_dir, get_logger, evaluate_scores_list, PlotUtils
+from utils import check_dir, get_logger, evaluate_scores_list, PlotUtils, Recorder
 
 IS_FRESH = False
 
 
-@hydra.main(config_path="config", config_name="config")
+@hydra.main(config_path="../config", config_name="config")
 def main(config):
     # Set config
     cwd = os.path.dirname(os.path.abspath(__file__))
-    config.datasets.dataset_root = os.path.join(cwd, "datasets")
-    config.models.gnn_saving_path = os.path.join(cwd, "checkpoints")
-    config.explainers.explanation_result_path = os.path.join(cwd, "results")
+    pwd = os.path.dirname(cwd)  
+    config.datasets.dataset_root = os.path.join(pwd, "datasets")
+    config.models.gnn_saving_path = os.path.join(pwd, "checkpoints")
+    config.explainers.explanation_result_path = os.path.join(pwd, "results")
+
+    if not os.path.isdir(config.record_filename):
+        os.makedirs(config.record_filename)
+    config.record_filename = os.path.join(config.record_filename, f"{config.datasets.dataset_name}.json")
+
+    recorder = Recorder(config.record_filename)
 
     config.models.param = config.models.param[config.datasets.dataset_name]
     config.explainers.param = config.explainers.param[config.datasets.dataset_name]
 
     explainer_name = config.explainers.explainer_name
 
-    log_file = (
-        f"{explainer_name}_{config.datasets.dataset_name}_{config.models.gnn_name}.log"
-    )
-    logger = get_logger(config.log_path, log_file, config.console_log, config.log_level)
-    logger.debug(OmegaConf.to_yaml(config))
+    # log_file = (
+    #     f"{explainer_name}_{config.datasets.dataset_name}_{config.models.gnn_name}.log"
+    # )
+    # logger = get_logger(config.log_path, log_file, config.console_log, config.log_level)
+    # logger.debug(OmegaConf.to_yaml(config))
 
     # Set device
     if torch.cuda.is_available():
@@ -57,7 +64,7 @@ def main(config):
     
     # if config.datasets.data_explain_cutoff > 0:
     #     test_indices = test_indices[: config.datasets.data_explain_cutoff]
-    # TODO: Partial
+
     import random
     random.seed(config.datasets.seed)
     random.shuffle(test_indices)
@@ -108,8 +115,8 @@ def main(config):
     rst = torch.concat(rst)
     payoff_avg = preds.mean(0).tolist()
     acc = rst.float().mean().item()
-    logger.debug("Predicted prob: " + ",".join([f"{p:.4f}" for p in payoff_avg]))
-    logger.debug(f"Test acc: {acc:.4f}")
+    # logger.debug("Predicted prob: " + ",".join([f"{p:.4f}" for p in payoff_avg]))
+    # logger.debug(f"Test acc: {acc:.4f}")
 
     explainer = GStarX(
         model,
@@ -133,7 +140,6 @@ def main(config):
         )
         if not IS_FRESH and os.path.isfile(explained_example_path):
             node_scores = torch.load(explained_example_path)
-            logger.debug(f"Load example {idx}.")
             # node_scores = explainer.explain(
             #     data,
             #     superadditive_ext=config.explainers.superadditive_ext,
@@ -159,7 +165,6 @@ def main(config):
         scores_list += [node_scores]
 
         if config.save_plot:
-            logger.debug(f"Plotting example {idx}.")
             from utils import (
                 scores2coalition,
                 evaluate_coalition,
@@ -195,15 +200,30 @@ def main(config):
         dataset[test_indices],
         scores_list,
         config.explainers.sparsity,
-        logger,
     )
 
-    metrics_str = ",".join([f"{m : .4f}" for m in metrics])
-    print(metrics_str)
-    logger.info(f"Time in seconds: {end_time - start_time}\n"
-                f"Avg Time: {(end_time - start_time)/len(test_indices)}")
-    print(f"Time in seconds: {end_time - start_time}")
-    print(f"Avg Time: {(end_time - start_time)/len(test_indices)}")
+    sp_mean, f_mean, inv_f_mean, n_f_mean, n_inv_f_mean, h_f_mean = metrics
+
+    # metrics_str = ",".join([f"{m : .4f}" for m in metrics])
+    # print(metrics_str)
+    # logger.info(f"Time in seconds: {end_time - start_time}\n"
+    #             f"Avg Time: {(end_time - start_time)/len(test_indices)}")
+    # print(f"Time in seconds: {end_time - start_time}")
+    # print(f"Avg Time: {(end_time - start_time)/len(test_indices)}")
+
+    experiment_data = {
+        'fidelity': f_mean,
+        'fidelity_inv': inv_f_mean,
+        'h_fidelity': h_f_mean,
+        'sparsity': sp_mean,
+        'Time in seconds': end_time - start_time,
+        'Average Time': (end_time - start_time)/len(test_indices)
+    }
+    
+    recorder.append(experiment_settings=['gstarx', f"{config.explainers.sparsity}"],
+                    experiment_data=experiment_data)
+
+    recorder.save()
 
 
 if __name__ == "__main__":

@@ -10,7 +10,7 @@ from torch_geometric.utils import add_remaining_self_loops, remove_self_loops
 from tqdm import tqdm
 from gnnNets import get_gnnNets
 from load_dataset import get_dataset, get_dataloader
-from SAME.methods.initialization_mcts import MCTS, reward_func
+from methods.initialization_mcts import MCTS, reward_func
 from torch_geometric.data import Batch
 from shapley import GnnNets_GC2value_func, gnn_score
 from utils import PlotUtils, find_closest_node_result, Recorder, eval_metric, fidelity_normalize_and_harmonic_mean
@@ -177,9 +177,7 @@ def pipeline(config):
         'inv_fidelity': np.mean(inv_fide_list),
         'h_fidelity': np.mean(h_fides),
         'sparsity': np.mean(sparsity_score_list),
-        'STD of sparsity': np.std(sparsity_score_list),
-        'fidelity_abs': np.mean(abs_fidelity_score_list),
-        'STD of fidelity_abs': np.std(abs_fidelity_score_list),
+        'STD of sparsity': np.std(sparsity_score_list),   
         'Time in seconds': end_time - start_time,
         'Average Time': (end_time - start_time)/len(data_indices)
     }

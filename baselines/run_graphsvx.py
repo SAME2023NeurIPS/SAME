@@ -1,6 +1,7 @@
 import os
 import sys
 import warnings
+import time
 
 warnings.filterwarnings("ignore")
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -10,7 +11,7 @@ from tqdm import tqdm
 from omegaconf import OmegaConf
 from load_dataset import get_dataset, get_dataloader
 from gnnNets import get_gnnNets
-from utils import check_dir, get_logger, evaluate_scores_list, PlotUtils
+from utils import check_dir, get_logger, evaluate_scores_list, PlotUtils, Recorder
 from methods import GraphSVX
 
 IS_FRESH = False
@@ -24,17 +25,17 @@ def main(config):
     config.datasets.dataset_root = os.path.join(pwd, "datasets")
     config.models.gnn_saving_path = os.path.join(pwd, "checkpoints")
     config.explainers.explanation_result_path = os.path.join(cwd, "results")
-    config.log_path = os.path.join(cwd, "log")
+
+    if not os.path.isdir(config.record_filename):
+        os.makedirs(config.record_filename)
+    config.record_filename = os.path.join(config.record_filename, f"{config.datasets.dataset_name}.json")
+    
+    recorder = Recorder(config.record_filename)
 
     config.models.param = config.models.param[config.datasets.dataset_name]
     config.explainers.param = config.explainers.param[config.datasets.dataset_name]
 
     explainer_name = f"{config.explainers.explainer_name}"
-    log_file = (
-        f"{explainer_name}_{config.datasets.dataset_name}_{config.models.gnn_name}.log"
-    )
-    logger = get_logger(config.log_path, log_file, config.console_log, config.log_level)
-    logger.debug(OmegaConf.to_yaml(config))
 
     if torch.cuda.is_available():
         device = torch.device("cuda", index=config.device_id)
@@ -56,7 +57,7 @@ def main(config):
 
         # if config.datasets.data_explain_cutoff > 0:
         #     test_indices = test_indices[: config.datasets.data_explain_cutoff]
-        # TODO: Partial
+
         import random
         random.seed(config.datasets.seed)
         random.shuffle(test_indices)
@@ -103,6 +104,7 @@ def main(config):
 
     plot_utils = PlotUtils(config.datasets.dataset_name, is_show=False)
     scores_list = []
+    start_time = time.time()
     for i, data in enumerate(tqdm(dataset[test_indices])):
         idx = test_indices[i]
         explained_example_path = os.path.join(
@@ -162,16 +164,32 @@ def main(config):
             #     figname=explained_example_plot_path,
             # )
 
+    end_time = time.time()
     metrics = evaluate_scores_list(
         explainer,
         dataset[test_indices],
         scores_list,
         config.explainers.sparsity,
-        logger,
     )
 
-    metrics_str = ",".join([f"{m : .4f}" for m in metrics])
-    print(metrics_str)
+    sp_mean, f_mean, inv_f_mean, n_f_mean, n_inv_f_mean, h_f_mean = metrics
+
+    # metrics_str = ",".join([f"{m : .4f}" for m in metrics])
+    # print(metrics_str)
+
+    experiment_data = {
+        'fidelity': f_mean,
+        'fidelity_inv': inv_f_mean,
+        'h_fidelity': h_f_mean,
+        'sparsity': sp_mean,
+        'Time in seconds': end_time - start_time,
+        'Average Time': (end_time - start_time)/len(test_indices)
+    }
+    
+    recorder.append(experiment_settings=['graphsvx', f"{config.explainers.sparsity}"],
+                    experiment_data=experiment_data)
+
+    recorder.save()
 
 
 if __name__ == "__main__":

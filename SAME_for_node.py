@@ -9,7 +9,7 @@ import numpy as np
 import time
 from gnnNets import get_gnnNets
 from load_dataset import get_dataset, get_dataloader
-from SAME.methods.initialization_mcts_for_node import MCTS, reward_func
+from methods.initialization_mcts_for_node import MCTS, reward_func
 from shapley import gnn_score, GnnNets_NC2value_func
 from torch_geometric.utils import to_networkx, add_remaining_self_loops
 from utils import PlotUtils, find_closest_node_result, eval_metric, Recorder, fidelity_normalize_and_harmonic_mean
@@ -139,11 +139,12 @@ def pipeline(config):
         h_fides.append(h_f)
 
         # visualization
-        subgraph_node_labels = nx.get_node_attributes(tree_node_x.ori_graph, name='label')
-        subgraph_node_labels = torch.tensor([v for k, v in subgraph_node_labels.items()])
-        plotutils.plot(tree_node_x.ori_graph, tree_node_x.coalition, y=subgraph_node_labels,
-                       node_idx=mcts_state_map.node_idx,
-                       figname=os.path.join(save_dir, f"node_{node_idx}.png"))
+        if config.save_plot:
+            subgraph_node_labels = nx.get_node_attributes(tree_node_x.ori_graph, name='label')
+            subgraph_node_labels = torch.tensor([v for k, v in subgraph_node_labels.items()])
+            plotutils.plot(tree_node_x.ori_graph, tree_node_x.coalition, y=subgraph_node_labels,
+                        node_idx=mcts_state_map.node_idx,
+                        figname=os.path.join(save_dir, f"node_{node_idx}.png"))
 
     end_time = time.time()
     experiment_data = {
@@ -151,7 +152,6 @@ def pipeline(config):
         'fidelity_inv': np.mean(fidelity_inv),
         'h_fidelity': np.mean(h_fides),
         'sparsity': sum(sparsity_score_list) / len(sparsity_score_list),
-        'fidelity_abs': sum(abs_fidelity_score_list) / len(abs_fidelity_score_list),
         'Time in seconds': end_time - start_time,
         'Average Time': (end_time - start_time)/len(node_indices)
     }

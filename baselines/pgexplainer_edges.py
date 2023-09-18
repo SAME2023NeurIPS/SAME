@@ -109,7 +109,7 @@ class PGExplainer_edges(ExplainerBase):
         return edge_masks, hard_edge_masks, related_preds
 
 
-@hydra.main(config_path="config", config_name="config")
+@hydra.main(config_path="../config", config_name="config")
 def pipeline(config):
     config.models.param = config.models.param[config.datasets.dataset_name]
     config.explainers.param = config.explainers.param[config.datasets.dataset_name]
@@ -142,7 +142,7 @@ def pipeline(config):
         if config.datasets.dataset_name == 'mutag':
             train_indices = list(range(len(dataset)))
             test_indices = list(range(len(dataset)))
-        # TODO: Partial
+
         import random
         random.seed(config.datasets.seed)
         random.shuffle(test_indices)
@@ -151,6 +151,7 @@ def pipeline(config):
             test_indices = sorted(test_indices, key=lambda x: dataset[x].num_nodes, reverse=True)
             test_indices = [x for x in test_indices if dataset[x].num_nodes == 16]
             test_indices = test_indices[10:40]
+    
     else:
         train_indices = range(len(dataset))
 
@@ -174,7 +175,9 @@ def pipeline(config):
     eval_model.to(device)
 
     fides_abs = []
-    fides_ori = []
+    ori_fide_list = []
+    inv_fide_list = []
+    h_fide_list = []
     spars = []
     scores = []
     
@@ -279,9 +282,11 @@ def pipeline(config):
                 explanation_saving_dir, f"example_{idx}.png"
             )
 
-            fide, score = eval_metric(related_preds["origin"], related_preds["maskout"], related_preds["sparsity"])
-            fides_abs.append(fide)
-            fides_ori.append(f)
+            abs_fide, score = eval_metric(related_preds["origin"], related_preds["maskout"], related_preds["sparsity"])
+            fides_abs.append(abs_fide)
+            ori_fide_list.append(f)
+            inv_fide_list.append(inv_f)
+            h_fide_list.append(h_f)
             scores.append(score)
             spars.append(sp)
 
@@ -342,21 +347,31 @@ def pipeline(config):
                 #                 related_preds[target_label]['accuracy'] - torch.tensor(all_roc_aucs).mean().item()
 
             x_collector.collect_data(edge_masks, related_preds, label=predictions[node_idx].item())
-            fide, score = eval_metric(related_preds[predictions[node_idx].item()]["origin"], related_preds[predictions[node_idx].item()]["maskout"],
+            abs_fide, score = eval_metric(related_preds[predictions[node_idx].item()]["origin"], related_preds[predictions[node_idx].item()]["maskout"],
                                       related_preds[predictions[node_idx].item()]["sparsity"])
-            fides_abs.append(fide)
-            fides_ori.append(related_preds[predictions[node_idx].item()]["origin"] - related_preds[predictions[node_idx].item()]["maskout"])
+            
+            from baselines_utils import fidelity_normalize_and_harmonic_mean
+
+            f = related_preds[predictions[node_idx].item()]["origin"] - related_preds[predictions[node_idx].item()]["maskout"]
+            inv_f = related_preds[predictions[node_idx].item()]["origin"] - related_preds[predictions[node_idx].item()]["masked"]
+            sp = related_preds[predictions[node_idx].item()]["sparsity"]
+            n_f, n_inv_f, h_f = fidelity_normalize_and_harmonic_mean(f, inv_f, sp)
+
+            fides_abs.append(abs_fide)
+            ori_fide_list.append(f)
+            inv_fide_list.append(inv_f)
+            h_fide_list.append(h_f)
             scores.append(score)
-            spars.append(related_preds[predictions[node_idx].item()]["sparsity"])
+            spars.append(sp)
 
     end_time = time.time()
 
     experiment_data = {
-        'fidelity': np.mean(fides_ori),
+        'fidelity': np.mean(ori_fide_list),
+        'inv_fidelity': np.mean(inv_fide_list),
+        'h_fidelity': np.mean(h_fide_list),
         'sparsity': np.mean(spars),
         'STD of sparsity': np.std(spars),
-        'fidelity_abs': np.mean(fides_abs),
-        'STD of fidelity_abs': np.std(fides_abs),
         'Training time': train_time,
         'Time in seconds': end_time - start_time,
         'Average Time': (end_time - start_time)/len(test_indices)

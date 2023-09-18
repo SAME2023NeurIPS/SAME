@@ -71,7 +71,7 @@ def find_closest_node_result(results, max_nodes=5, **kwargs):
         dfs([], 0)
         results = sorted(results, key=lambda x: x.P, reverse=True)
     elif method.lower() == 'mcts':
-        mcts_state_map = exploration_MCTS(data.x, data.edge_index, results[:max_i]
+        mcts_state_map = exploration_MCTS(data.x, data.edge_index, results[:max_i],
                                           score_func=score_func,
                                           n_rollout=10,
                                           explanation_size=max_nodes, 
@@ -745,7 +745,7 @@ def evaluate_coalition(explainer, data, coalition, node_idx=None, config=None):
     sparsity = 1 - len(coalition) / num_nodes
     return fidelity, abs_fidelity, inv_fidelity, sparsity
 
-def evaluate_scores_list(explainer, data_list, scores_list, sparsity, logger=None):
+def evaluate_scores_list(explainer, data_list, scores_list, sparsity):
     """
     Evaluate the node importance scoring methods, where each node has an associated score,
     i.e. GStarX and GraphSVX.
@@ -787,16 +787,16 @@ def evaluate_scores_list(explainer, data_list, scores_list, sparsity, logger=Non
     sp_mean = np.mean(sp_list).item()
     h_f_mean = np.mean(h_f_list).item()
 
-    if logger is not None:
-        logger.info(
-            f"Fidelity Mean: {f_mean:.5f}\n"
-            f"Abs Fidelity Mean: {abs_f_mean:.5f}\n"
-            f"Inv-Fidelity Mean: {inv_f_mean:.5f}\n"
-            f"Norm-Fidelity Mean: {n_f_mean:.5f}\n"
-            f"Norm-Inv-Fidelity Mean: {n_inv_f_mean:.5f}\n"
-            f"Sparsity Mean: {sp_mean:.5f}\n"
-            f"Harmonic-Fidelity Mean: {h_f_mean:.5f}\n"
-        )
+    # if logger is not None:
+    #     logger.info(
+    #         f"Fidelity Mean: {f_mean:.5f}\n"
+    #         f"Abs Fidelity Mean: {abs_f_mean:.5f}\n"
+    #         f"Inv-Fidelity Mean: {inv_f_mean:.5f}\n"
+    #         f"Norm-Fidelity Mean: {n_f_mean:.5f}\n"
+    #         f"Norm-Inv-Fidelity Mean: {n_inv_f_mean:.5f}\n"
+    #         f"Sparsity Mean: {sp_mean:.5f}\n"
+    #         f"Harmonic-Fidelity Mean: {h_f_mean:.5f}\n"
+    #     )
 
     return sp_mean, f_mean, inv_f_mean, n_f_mean, n_inv_f_mean, h_f_mean
 

@@ -57,7 +57,7 @@ def evaluate_related_preds(related_preds):
     return fidelity, inv_fidelity, sparsity
 
 
-def evaluate_related_preds_list(related_preds_list, logger=None):
+def evaluate_related_preds_list(related_preds_list):
     """
     Evaluate the DIG implementation of the baseline models,
     i.e. GNNExplainer, PGExplainer, and SubgraphX
@@ -88,13 +88,13 @@ def evaluate_related_preds_list(related_preds_list, logger=None):
     sp_mean = np.mean(sp_list).item()
     h_f_mean = np.mean(h_f_list).item()
 
-    if logger is not None:
-        logger.info(
-            f"Fidelity Mean: {f_mean:.4f}\n"
-            f"Inv-Fidelity Mean: {inv_f_mean:.4f}\n"
-            f"Norm-Fidelity Mean: {n_f_mean:.4f}\n"
-            f"Norm-Inv-Fidelity Mean: {n_inv_f_mean:.4f}\n"
-            f"Sparsity Mean: {sp_mean:.4f}\n"
-            f"Harmonic-Fidelity Mean: {h_f_mean:.4f}\n"
-        )
+    # if logger is not None:
+    #     logger.info(
+    #         f"Fidelity Mean: {f_mean:.4f}\n"
+    #         f"Inv-Fidelity Mean: {inv_f_mean:.4f}\n"
+    #         f"Norm-Fidelity Mean: {n_f_mean:.4f}\n"
+    #         f"Norm-Inv-Fidelity Mean: {n_inv_f_mean:.4f}\n"
+    #         f"Sparsity Mean: {sp_mean:.4f}\n"
+    #         f"Harmonic-Fidelity Mean: {h_f_mean:.4f}\n"
+    #     )
     return sp_mean, f_mean, inv_f_mean, n_f_mean, n_inv_f_mean, h_f_mean

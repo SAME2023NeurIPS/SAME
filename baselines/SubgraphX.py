@@ -21,7 +21,7 @@ from dig.xgraph.utils.compatibility import compatible_state_dict
 IS_FRESH = False
 
 
-@hydra.main(config_path="config", config_name="config")
+@hydra.main(config_path="../config", config_name="config")
 def pipeline(config):
     config.models.param = config.models.param[config.datasets.dataset_name]
     config.explainers.param = config.explainers.param[config.datasets.dataset_name]
@@ -58,7 +58,7 @@ def pipeline(config):
         test_indices = loader['test'].dataset.indices
         if config.datasets.dataset_name == 'mutag':
             test_indices = list(range(len(dataset)))
-        # TODO: Partial
+
         import random
         random.seed(config.datasets.seed)
         random.shuffle(test_indices)
@@ -107,21 +107,14 @@ def pipeline(config):
         index = 0
         x_collector = XCollector()
         for i, data in enumerate(dataset[test_indices]):
-            # if test_indices[i] != 173:
-            #     continue
             index += 1
-            # if index == 1:
-            #     continue
             data.to(device)
             data.edge_index = add_remaining_self_loops(data.edge_index, num_nodes=data.num_nodes)[0]
             saved_MCTSInfo_list = None
             prediction = model(data).argmax(-1).item()
             if os.path.isfile(os.path.join(explanation_saving_dir, f'example_{test_indices[i]}.pt')) and not IS_FRESH:
-                pass
                 saved_MCTSInfo_list = torch.load(os.path.join(explanation_saving_dir, f'example_{test_indices[i]}.pt'))
                 print(f"load example {test_indices[i]}.")
-            # else:
-            #     continue
 
             max_nodes = np.ceil(data.num_nodes * (1-config.explainers.sparsity))
             explain_result, related_preds = \
@@ -168,16 +161,17 @@ def pipeline(config):
 
             predict_true = 'True' if prediction == data.y.item() else "False"
 
-            subgraphx.visualization(explain_result,
-                                    max_nodes=max_nodes,
-                                    plot_utils=plot_utils,
-                                    title_sentence=title_sentence,
-                                    vis_name=os.path.join(explanation_saving_dir,
-                                                          f'example_{test_indices[i]}_'
-                                                          f'prediction_{prediction}_'
-                                                          f'label_{data.y.item()}_'
-                                                          f'pred_{predict_true}.png'),
-                                    words=words)
+            if config.save_plot:
+                subgraphx.visualization(explain_result,
+                                        max_nodes=max_nodes,
+                                        plot_utils=plot_utils,
+                                        title_sentence=title_sentence,
+                                        vis_name=os.path.join(explanation_saving_dir,
+                                                            f'example_{test_indices[i]}_'
+                                                            f'prediction_{prediction}_'
+                                                            f'label_{data.y.item()}_'
+                                                            f'pred_{predict_true}.png'),
+                                        words=words)
 
             explain_result = [explain_result]
             related_preds = [related_preds]
@@ -243,13 +237,14 @@ def pipeline(config):
 
             explain_result = subgraphx.read_from_MCTSInfo_list(explain_result)
 
-            subgraphx.visualization(explain_result,
-                                    y=data.y,
-                                    max_nodes=config.explainers.max_ex_size,
-                                    plot_utils=plot_utils,
-                                    title_sentence=title_sentence,
-                                    vis_name=os.path.join(explanation_saving_dir,
-                                                          f'example_{node_idx}.png'))
+            if config.save_plot:
+                subgraphx.visualization(explain_result,
+                                        y=data.y,
+                                        max_nodes=config.explainers.max_ex_size,
+                                        plot_utils=plot_utils,
+                                        title_sentence=title_sentence,
+                                        vis_name=os.path.join(explanation_saving_dir,
+                                                            f'example_{node_idx}.png'))
 
             explain_result = [explain_result]
             related_preds = [related_preds]
@@ -263,8 +258,6 @@ def pipeline(config):
         'h_fidelity': np.mean(h_f_list),
         'sparsity': np.mean(spars),
         'STD of sparsity': np.std(spars),
-        'fidelity_abs': np.mean(abs_fides),
-        'STD of fidelity_abs': np.std(abs_fides),
         'Time in seconds': end_time - start_time,
         'Average Time': (end_time - start_time)/len(test_indices)
     }
@@ -278,11 +271,12 @@ def pipeline(config):
 if __name__ == '__main__':
     import sys
     
-    cwd = os.path.dirname(os.path.abspath(__file__))   
+    cwd = os.path.dirname(os.path.abspath(__file__)) 
+    pwd = os.path.dirname(cwd)  
         
     sys.argv.append('explainers=subgraphx')
-    sys.argv.append(f"datasets.dataset_root={os.path.join(cwd, 'datasets')}")
-    sys.argv.append(f"models.gnn_saving_dir={os.path.join(cwd, 'checkpoints')}")
-    sys.argv.append(f"explainers.explanation_result_dir={os.path.join(cwd, 'results')}")
-    sys.argv.append(f"record_filename={os.path.join(cwd, 'result_jsons')}")
+    sys.argv.append(f"datasets.dataset_root={os.path.join(pwd, 'datasets')}")
+    sys.argv.append(f"models.gnn_saving_dir={os.path.join(pwd, 'checkpoints')}")
+    sys.argv.append(f"explainers.explanation_result_dir={os.path.join(pwd, 'results')}")
+    sys.argv.append(f"record_filename={os.path.join(pwd, 'result_jsons')}")
     pipeline()

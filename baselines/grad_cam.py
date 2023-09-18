@@ -13,10 +13,10 @@ from dig.xgraph.utils.compatibility import compatible_state_dict
 
 from gnnNets import get_gnnNets
 from load_dataset import get_dataset, get_dataloader
-from utils import check_dir, fix_random_seed, Recorder, perturb_input, eval_metric, PlotUtils, to_networkx
+from utils import check_dir, fix_random_seed, Recorder, perturb_input, eval_metric, PlotUtils, to_networkx, fidelity_normalize_and_harmonic_mean
 IS_FRESH = False
 
-@hydra.main(config_path="config", config_name="config")
+@hydra.main(config_path="../config", config_name="config")
 def pipeline(config):
     config.models.param = config.models.param[config.datasets.dataset_name]
     config.explainers.param = config.explainers.param[config.datasets.dataset_name]
@@ -48,7 +48,6 @@ def pipeline(config):
         if config.datasets.dataset_name == 'mutag':
             test_indices = list(range(len(dataset)))
             
-        # TODO: Partial
         import random
         random.seed(config.datasets.seed)
         random.shuffle(test_indices)
@@ -57,6 +56,7 @@ def pipeline(config):
             test_indices = sorted(test_indices, key=lambda x: dataset[x].num_nodes, reverse=True)
             test_indices = [x for x in test_indices if dataset[x].num_nodes == 16]
             test_indices = test_indices[10:40]  
+
     else:
         node_indices_mask = (dataset.data.y != 0) * dataset.data.test_mask
         node_indices = torch.where(node_indices_mask)[0]
@@ -77,7 +77,9 @@ def pipeline(config):
     model.to(device)
 
     fides_abs = []
-    fides_ori = []
+    ori_fide_list = []
+    inv_fide_list = []
+    h_fide_list = []
     spars = []
     scores = []
 
@@ -142,17 +144,25 @@ def pipeline(config):
             node_list = [x.item() for x in node_mask]
 
             x_collector.collect_data(hard_edge_masks, related_preds, label=prediction)
-            fide, score = eval_metric(related_preds[prediction]["origin"], related_preds[prediction]["maskout"],
+            abs_fide, score = eval_metric(related_preds[prediction]["origin"], related_preds[prediction]["maskout"],
                                       related_preds[prediction]["sparsity"])
-            fides_abs.append(fide)
-            fides_ori.append(related_preds[prediction]["origin"] - related_preds[prediction]["maskout"])
+            ori_fide = related_preds[prediction]["origin"] - related_preds[prediction]["maskout"]
+            inv_fide = related_preds[prediction]["origin"] - related_preds[prediction]["masked"]
+            sp = related_preds[prediction]["sparsity"]
+            _, _, h_f = fidelity_normalize_and_harmonic_mean(ori_fide, inv_fide, sp)
+
+            fides_abs.append(abs_fide)
+            ori_fide_list.append(ori_fide)
+            inv_fide_list.append(inv_fide)
+            h_fide_list.append(h_f)
             scores.append(score)
-            spars.append(related_preds[prediction]["sparsity"])
+            spars.append(sp)
             
-            title_sentence = f'fide: {fides_ori[-1]:.4f}, spar: {spars[-1]:.4f}'
-            plotutils.plot(to_networkx(data, remove_self_loops=True), node_list, words=words, x=data.x,
-                           figname=os.path.join(explanation_saving_dir, f"example_{test_indices[i]}.png"),
-                           title_sentence=title_sentence)
+            if config.save_plot:
+                title_sentence = f'fide: {ori_fide_list[-1]:.4f}, spar: {spars[-1]:.4f}'
+                plotutils.plot(to_networkx(data, remove_self_loops=True), node_list, words=words, x=data.x,
+                            figname=os.path.join(explanation_saving_dir, f"example_{test_indices[i]}.png"),
+                            title_sentence=title_sentence)
 
 
     else:
@@ -220,24 +230,29 @@ def pipeline(config):
                             all_roc_aucs[target_label]).mean().item()
 
             x_collector.collect_data(masks, related_preds, label=prediction[node_idx].item())
-            fide, score = eval_metric(related_preds[prediction[node_idx].item()]["origin"],
+            abs_fide, score = eval_metric(related_preds[prediction[node_idx].item()]["origin"],
                                       related_preds[prediction[node_idx].item()]["maskout"],
                                       related_preds[prediction[node_idx].item()]["sparsity"])
-            fides_abs.append(fide)
-            fides_ori.append(
-                related_preds[prediction[node_idx].item()]["origin"] - related_preds[prediction[node_idx].item()][
-                    "maskout"])
+            ori_fide = related_preds[prediction[node_idx].item()]["origin"] - related_preds[prediction[node_idx].item()]["maskout"]
+            inv_fide = related_preds[prediction[node_idx].item()]["origin"] - related_preds[prediction[node_idx].item()]["masked"]
+            sp = related_preds[prediction[node_idx].item()]["sparsity"]
+            _, _, h_f = fidelity_normalize_and_harmonic_mean(ori_fide, inv_fide, sp)
+
+            fides_abs.append(abs_fide)
+            ori_fide_list.append(ori_fide)
+            inv_fide_list.append(inv_fide)
+            h_fide_list.append(h_f)
             scores.append(score)
             spars.append(related_preds[prediction[node_idx].item()]["sparsity"])
 
     end_time = time.time()
 
     experiment_data = {
-        'fidelity': np.mean(fides_ori),
+        'fidelity': np.mean(ori_fide_list),
+        'inv_fidelity': np.mean(inv_fide_list),
+        'h_fidelity': np.mean(h_fide_list),
         'sparsity': np.mean(spars),
         'STD of sparsity': np.std(spars),
-        'fidelity_abs': np.mean(fides_abs),
-        'STD of fidelity_abs': np.std(fides_abs),
         'Time in seconds': end_time - start_time,
         'Average Time': (end_time - start_time)/len(test_indices)
     }
