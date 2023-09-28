@@ -1,6 +1,7 @@
-# <u>S</u>tructure-<u>A</u>ware Shapley-based  <u>M</u>ultipiece <u>E</u>xplanation (SAME)
+<h1 align="center">:fire:SAME:fire:</h1>
+<a href="https://same2023neurips.github.io/"><img src="https://img.shields.io/website-up-down-green-red/http/shields.io.svg"></a>
 
-Official code for 2023 NeurIPS paper: `SAME: Uncovering GNN Black Box with Structure-aware Shapley-based Multipiece Explanations`
+This repo contains PyTorch implementation the paper: `SAME: Uncovering GNN Black Box with Structure-aware Shapley-based Multipiece Explanations` in 2023 NeurIPS.
 
 
 ## Getting Started
