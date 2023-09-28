@@ -1,40 +1,6 @@
 # <u>S</u>tructure-<u>A</u>ware Shapley-based  <u>M</u>ultipiece <u>E</u>xplanation (SAME)
 
-Code for SAME: Uncovering GNN Black Box with Structure-aware Shapley-based  Multipiece Explanations
-
-## How Can SAME Uncover GNN Black Box -- A Qualitative Analysis
-
-### Explanation on the sentiment graphs: `Graph-SST2` dataset
-
-SAME can well capture the adjectives-or-adverbs-like graph structures than other baselines. 
-
-<p align="center">
-  <br />
-  <img src="imgs/graph_sst2_visualization.png" width="1000">
-  <br />
-</p>
-
-
-### Explanation on the molecular graphs: `MUTAG` dataset
-
-SAME achieves to provide the explanations the same as the ground truth which are labelled by human experts. 
-
-<p align="center">
-  <br />
-  <img src="imgs/mutag_visualization.png" width="1000">
-  <br />
-</p>
-
-
-### Explanation on the synthetic Barabási–Albert graphs: `BA-2Motifs` dataset
-
-SAME exactly finds the ground-truth explanation (a 5-node-house-structure motif) compared to other baselines.
-
-<p align="center">
-  <br />
-  <img src="imgs/ba_2mofits_visualization.png" width="1000">
-  <br />
-</p>
+Official code for 2023 NeurIPS paper: `SAME: Uncovering GNN Black Box with Structure-aware Shapley-based Multipiece Explanations`
 
 
 ## Getting Started
@@ -86,7 +52,7 @@ model_name=gcn
 python run_one_model.sh $explainer $dataset_name $sparsity $model_name
 ```
 
-## Results
+## Quantitative Analysis
 
 Comparison of our SAME and other baseline using fidelity. The fidelity results are averaged across different sparsity from 0.5 to 0.8. And they are presented in the form of mean $\pm$ std.
 
@@ -100,15 +66,51 @@ Comparison of our SAME and other baseline using fidelity. The fidelity results a
 |    GStarX    |       $0.117\pm0.043$       | $\underline{0.656\pm0.096}$ |       $0.183\pm0.050$       |       $0.186\pm0.050$       |       $0.476\pm0.014$       |              -              |
 |   **SAME**   |  $\mathbf{0.489\pm0.034}$   |  $\mathbf{0.702\pm0.125}$   |  $\mathbf{0.373\pm0.042}$   |  $\mathbf{0.393\pm0.022}$   |  $\mathbf{0.549\pm0.004}$   |  $\mathbf{0.214\pm0.000}$   |
 
-## Reference
 
-The baseline methods of our code is borrowed from the following repositories. We acknowledge their implementations. 
+## Qualitative Analysis
+
+### Explanation on the sentiment graphs: `Graph-SST2` dataset
+
+SAME can well capture the adjectives-or-adverbs-like graph structures than other baselines. 
+
+<p align="center">
+  <br />
+  <img src="imgs/graph_sst2_visualization.png" width="1000">
+  <br />
+</p>
+
+
+### Explanation on the molecular graphs: `MUTAG` dataset
+
+SAME achieves to provide the explanations the same as the ground truth which are labelled by human experts. 
+
+<p align="center">
+  <br />
+  <img src="imgs/mutag_visualization.png" width="1000">
+  <br />
+</p>
+
+
+### Explanation on the synthetic Barabási–Albert graphs: `BA-2Motifs` dataset
+
+SAME exactly finds the ground-truth explanation (a 5-node-house-structure motif) compared to other baselines.
+
+<p align="center">
+  <br />
+  <img src="imgs/ba_2mofits_visualization.png" width="1000">
+  <br />
+</p>
+
+## Acknowledgement
+
+The baseline methods of our code is adapted from the following repositories.
 
 https://github.com/ShichangZh/GStarX
 
 https://github.com/divelab/DIG/tree/main/dig/xgraph
 
+
 ## Contact Us
 
-If you have any questions, please contact [xxx@xxx.xxx]() or open an issue.  
+If you have any questions, please feel free contact us: [ziyuanye9801@gmail.com](ziyuanye9801@gmail.com) and [rihanhuang.work@gmail](rihanhuang.work@gmail) or open an issue.  
 
