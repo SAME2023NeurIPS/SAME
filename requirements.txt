@@ -1,6 +1,6 @@
 dgl==0.9.1
 dgllife==0.3.0
-pyscf==1.7.6
+pyscf==1.7.6.port1
 hydra-core==1.2.0
 matplotlib==3.5.2
 networkx==2.8.4
