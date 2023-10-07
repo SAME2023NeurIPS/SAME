@@ -13,6 +13,9 @@ The recommended Python version is 3.8 or 3.9.
 
 ```bash
 conda create -n same python==3.9
+```
+
+```bash
 pip install -r requirements.txt
 ```
 
