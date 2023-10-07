@@ -9,6 +9,11 @@ This repo contains PyTorch implementation the paper: `SAME: Uncovering GNN Black
 ## Getting Started
 
 ### Requirements
+The recommended Python version is 3.8 or 3.9.
+
+```bash
+conda create -n same python==3.9
+```
 
 ```bash
 pip install -r requirements.txt
