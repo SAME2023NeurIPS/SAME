@@ -9,6 +9,7 @@ __pycache__/
 # SAME
 datasets/
 results/
+*.zip
 
 # Distribution / packaging
 .Python

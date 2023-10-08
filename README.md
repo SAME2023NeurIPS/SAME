@@ -9,11 +9,13 @@ This repo contains PyTorch implementation the paper: `SAME: Uncovering GNN Black
 ## Getting Started
 
 ### Requirements
-The recommended Python version is 3.8 or 3.9.
+The recommended Python version is 3.8 or 3.9. (SAME is tested under Python 3.8, Pytorch 1.12.1 and PyG 2.1.0)
 
 ```bash
-conda create -n same python==3.9
+conda create -n same python==3.8
 ```
+
+Then, please follow the [Pytorch Guidelines](https://pytorch.org/get-started/previous-versions/) to install Pytorch and [INSTALL PYG](https://pytorch-geometric.readthedocs.io/en/latest/install/installation.html) to install PyG. After that, install other packages using: 
 
 ```bash
 pip install -r requirements.txt
@@ -23,7 +25,20 @@ pip install -r requirements.txt
 
 For the datasets used in our paper, please download them manually and move them into the folder `datasets/`. The file name is **case sensitive** and please make sure that all of the file names are in **lowercase**. For more information about the datasets, please refer to `dataset.py`. 
 
-Here we provide the link to download them. 
+Here we provide the link to download them. (`SAME_datasets` contains both raw and processed data. If you want raw data only, please kindly click `SAME_raw_datasets`) </br>
+[SAME_datasets](https://drive.google.com/file/d/1VXfb6hnKZ3nBsKMJPqvjI4Nz0ikk8skT/view?usp=sharing)  FILE_ID=`1VXfb6hnKZ3nBsKMJPqvjI4Nz0ikk8skT` </br>
+[SAME_raw_datasets](https://drive.google.com/file/d/1KqSHf6Xz_PXKNA6KwXucye1H18hKIMJ6/view?usp=drive_link)  FILE_ID=`1KqSHf6Xz_PXKNA6KwXucye1H18hKIMJ6` </br>
+
+\[Easy for Terminal\] You can download the dataset using the following bash. Remember to replace `FILE_ID` with that shown above. 
+
+```bash
+# install gdown to down file from google drive
+pip install gdown
+# download file using FILE_ID
+gdown https://drive.google.com/uc?id=FILE_ID
+```
+
+Our dataset is a small integration from DIG. We recommend you to explore more from the [DIG lab](https://github.com/divelab/DIG).
 
 ### Models
 
