@@ -3,7 +3,7 @@
 <a href="https://same2023neurips.github.io/"><img src="https://img.shields.io/website-up-down-green-red/http/shields.io.svg"></a>
 </p>
 
-This repo contains PyTorch implementation the paper: `SAME: Uncovering GNN Black Box with Structure-aware Shapley-based Multipiece Explanations` in 2023 NeurIPS.
+This repo contains PyTorch implementation of the paper: `SAME: Uncovering GNN Black Box with Structure-aware Shapley-based Multipiece Explanations` in 2023 NeurIPS.
 
 
 ## Getting Started
@@ -37,8 +37,6 @@ pip install gdown
 # download file using FILE_ID
 gdown https://drive.google.com/uc?id=FILE_ID
 ```
-
-Our dataset is a small integration from DIG. We recommend you to explore more from the [DIG lab](https://github.com/divelab/DIG).
 
 ### Models
 
@@ -77,7 +75,7 @@ python run_one_model.sh $explainer $dataset_name $sparsity $model_name
 
 ## Quantitative Analysis
 
-Comparison of our SAME and other baseline using fidelity. The fidelity results are averaged across different sparsity from 0.5 to 0.8. And they are presented in the form of mean $\pm$ std.
+Comparison of our SAME and other baselines using fidelity. The fidelity results are averaged across different sparsity from 0.5 to 0.8. And they are presented in the form of mean $\pm$ std.
 
 |   Datasets   |            BBBP             |            MUTAG            |         Graph-SST2          |         Graph-SST5          |         BA-2Motifs          |          BA-Shapes          |
 | :----------: | :-------------------------: | :-------------------------: | :-------------------------: | :-------------------------: | :-------------------------: | :-------------------------: |
@@ -105,7 +103,7 @@ SAME can well capture the adjectives-or-adverbs-like graph structures than other
 
 ### Explanation on the molecular graphs: `MUTAG` dataset
 
-SAME achieves to provide the explanations the same as the ground truth which are labelled by human experts. 
+SAME provides explanations the same as the ground truth which are labelled by human experts. 
 
 <p align="center">
   <br />
@@ -116,7 +114,7 @@ SAME achieves to provide the explanations the same as the ground truth which are
 
 ### Explanation on the synthetic Barabási–Albert graphs: `BA-2Motifs` dataset
 
-SAME exactly finds the ground-truth explanation (a 5-node-house-structure motif) compared to other baselines.
+SAME can exactly find the ground-truth explanation (a 5-node-house-structure motif) compared to other baselines.
 
 <p align="center">
   <br />
@@ -126,7 +124,7 @@ SAME exactly finds the ground-truth explanation (a 5-node-house-structure motif)
 
 ## Acknowledgement
 
-The baseline methods of our code is adapted from the following repositories.
+Some baseline methods of our code are adapted from the following repositories.
 
 https://github.com/ShichangZh/GStarX
 
