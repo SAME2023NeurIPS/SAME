@@ -13,7 +13,7 @@ from tqdm import tqdm
 from torch import nn, optim
 from torch_geometric.utils import dense_to_sparse
 from omegaconf import OmegaConf
-from ..load_dataset import get_dataset, get_dataloader
+from load_dataset import get_dataset, get_dataloader
 from gnnNets import get_gnnNets
 from utils import check_dir, get_logger, PlotUtils, Recorder
 from baselines.baselines_utils import evaluate_related_preds_list
@@ -28,14 +28,8 @@ from methods.orphicx import (
 
 IS_FRESH = False
 
-@hydra.main(config_path="../config", config_name="config")
+@hydra.main(config_path="../config", config_name="config", version_base='1.1.1')
 def pipeline(config):
-    cwd = os.path.dirname(os.path.abspath(__file__))
-    pwd = os.path.dirname(cwd)
-    config.datasets.dataset_root = os.path.join(pwd, "datasets")
-    config.models.gnn_saving_path = os.path.join(pwd, "checkpoints")
-    config.explainers.explanation_result_path = os.path.join(cwd, "results")
-
     if not os.path.isdir(config.record_filename):
         os.makedirs(config.record_filename)
     config.record_filename = os.path.join(config.record_filename, f"{config.datasets.dataset_name}.json")
@@ -135,7 +129,7 @@ def pipeline(config):
 
     state_dict = torch.load(
         os.path.join(
-            config.models.gnn_saving_path,
+            config.models.gnn_saving_dir,
             config.datasets.dataset_name,
             f"{config.models.gnn_name}_"
             f"{len(config.models.param.gnn_latent_dim)}l_best.pth",
@@ -394,6 +388,11 @@ def pipeline(config):
 
 if __name__ == "__main__":
     import sys
+    wkdir = os.path.dirname(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..'))
 
     sys.argv.append("explainers=orphicx")
+    sys.argv.append(f"datasets.dataset_root={os.path.join(wkdir, 'datasets')}")
+    sys.argv.append(f"models.gnn_saving_dir={os.path.join(wkdir, 'checkpoints')}")
+    sys.argv.append(f"explainers.explanation_result_path={os.path.join(wkdir, 'results')}")
+    sys.argv.append(f"record_filename={os.path.join(wkdir, 'result_jsons')}")
     pipeline()

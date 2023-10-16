@@ -72,7 +72,7 @@ explainer=same
 dataset_name=bbbp
 sparsity=0.8
 model_name=gcn
-python run_one_model.sh $explainer $dataset_name $sparsity $model_name
+bash run_one_model.sh $explainer $dataset_name $sparsity $model_name
 ```
 
 ## Quantitative Analysis

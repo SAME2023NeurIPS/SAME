@@ -9,10 +9,10 @@ import numpy as np
 import time
 from gnnNets import get_gnnNets
 from load_dataset import get_dataset, get_dataloader
-from methods.initialization_mcts_for_node import MCTS, reward_func
+from initialization_mcts_NC import MCTS, reward_func
 from shapley import gnn_score, GnnNets_NC2value_func
 from torch_geometric.utils import to_networkx, add_remaining_self_loops
-from utils import PlotUtils, find_closest_node_result, eval_metric, Recorder, fidelity_normalize_and_harmonic_mean
+from utils import PlotUtils, check_dir, find_explanations, eval_metric, Recorder, fidelity_normalize_and_harmonic_mean
 
 
 @hydra.main(config_path="config", config_name="config")
@@ -58,9 +58,8 @@ def pipeline(config):
     save_dir = os.path.join(cwd, 'results',
                             f"{config.datasets.dataset_name}",
                             f"{config.models.gnn_name}",
-                            f"Multi_{config.explainers.param.reward_method}")
-    if not os.path.isdir(save_dir):
-        os.mkdir(save_dir)
+                            f"SAME_{config.explainers.param.reward_method}")
+    check_dir(save_dir)
 
     plotutils = PlotUtils(dataset_name=config.datasets.dataset_name)
     abs_fidelity_score_list = []
@@ -107,7 +106,7 @@ def pipeline(config):
         else:
             gnn_results = mcts_state_map.mcts(verbose=True)
             torch.save(gnn_results, result_path)
-        tree_node_x = find_closest_node_result(gnn_results, gnnNets=gnnNets, data=data, config=config)
+        tree_node_x = find_explanations(gnn_results, gnnNets=gnnNets, data=data, config=config)
 
         # calculate the metrics
         tree_node_x = tree_node_x[0]

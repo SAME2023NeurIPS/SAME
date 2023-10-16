@@ -15,8 +15,8 @@ from textwrap import wrap
 import random
 import numpy as np
 import torch
-from methods.initialization_mcts import reward_func, MCTSNode
-from methods.exploration_mcts import exploration_MCTS
+from initialization_mcts_GC import reward_func, MCTSNode
+from exploration_mcts import exploration_MCTS
 from shapley import GnnNets_GC2value_func, GnnNets_NC2value_func
 from torch_geometric.utils import subgraph, to_dense_adj, k_hop_subgraph
 from torch_geometric.data import Data, Batch, Dataset, DataLoader
@@ -27,7 +27,7 @@ from scipy.sparse.csgraph import connected_components as cc
 
 
 
-def find_closest_node_result(results, max_nodes=5, **kwargs):
+def find_explanations(results, max_nodes=5, **kwargs):
     """ return the highest reward graph node constraining to the subgraph size """
     gamma = kwargs.get('config').explainers.param.single_explanation_size
     g = results[0].ori_graph

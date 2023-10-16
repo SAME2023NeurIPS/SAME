@@ -10,10 +10,10 @@ from torch_geometric.utils import add_remaining_self_loops, remove_self_loops
 from tqdm import tqdm
 from gnnNets import get_gnnNets
 from load_dataset import get_dataset, get_dataloader
-from methods.initialization_mcts import MCTS, reward_func
+from initialization_mcts_GC import MCTS, reward_func
 from torch_geometric.data import Batch
 from shapley import GnnNets_GC2value_func, gnn_score
-from utils import PlotUtils, find_closest_node_result, Recorder, eval_metric, fidelity_normalize_and_harmonic_mean
+from utils import PlotUtils, check_dir, find_explanations, Recorder, eval_metric, fidelity_normalize_and_harmonic_mean
 
 IS_FRESH = False
 
@@ -36,6 +36,7 @@ def pipeline(config):
 
     if config.datasets.dataset_name == 'mutag':
         data_indices = list(range(len(dataset)))
+        test_indices = data_indices
     else:
         dataloader_params = {'batch_size': config.models.param.batch_size,
                              'random_split_flag': config.datasets.random_split_flag,
@@ -44,8 +45,6 @@ def pipeline(config):
         loader = get_dataloader(dataset, **dataloader_params)
         train_indices = loader['train'].dataset.indices
         test_indices = loader['test'].dataset.indices
-        if config.datasets.dataset_name == 'mutag':
-            test_indices = list(range(len(dataset)))
         # TODO: Partial
         import random
         random.seed(config.datasets.seed)
@@ -56,7 +55,7 @@ def pipeline(config):
             test_indices = [x for x in test_indices if dataset[x].num_nodes == 16]
             test_indices = test_indices[10:40]
 
-    cwd = os.path.dirname(os.path.abspath(__file__))
+    # cwd = os.path.dirname(os.path.abspath(__file__))
     gnnNets = get_gnnNets(input_dim, output_dim, config.models)
     state_dict = compatible_state_dict(torch.load(os.path.join(cwd,
                                                                config.models.gnn_saving_dir,
@@ -70,9 +69,8 @@ def pipeline(config):
     save_dir = os.path.join(cwd, 'results',
                             f"{config.datasets.dataset_name}",
                             f"{config.models.gnn_name}",
-                            f"Multi_{config.explainers.param.reward_method}")
-    if not os.path.isdir(save_dir):
-        os.mkdir(save_dir)
+                            f"SAME_{config.explainers.param.reward_method}")
+    check_dir(save_dir)
     
     abs_fidelity_score_list = []
     sparsity_score_list = []
@@ -80,7 +78,7 @@ def pipeline(config):
     inv_fide_list = []
     h_fides = []
     start_time = time.time()
-    for i in tqdm(data_indices):
+    for i in tqdm(test_indices):
         # get data and prediction
         data = dataset[i]
         data.edge_index = add_remaining_self_loops(data.edge_index, num_nodes=data.num_nodes)[0]
@@ -119,14 +117,14 @@ def pipeline(config):
                 final_results = final_results.get(config.explainers.sparsity) # list
                 print(f"Load Example {i} with final result.")
             else:
-                new_final_results = find_closest_node_result(results, max_nodes=max_ex_size, gnnNets=gnnNets,
+                new_final_results = find_explanations(results, max_nodes=max_ex_size, gnnNets=gnnNets,
                                                             data=data, config=config).coalition
                 final_results[config.explainers.sparsity] = new_final_results   # dict
                 torch.save(final_results, final_result_path)
                 final_results = new_final_results   # list
         else:
             # l sharply score
-            final_results = find_closest_node_result(results, max_nodes=max_ex_size, gnnNets=gnnNets,
+            final_results = find_explanations(results, max_nodes=max_ex_size, gnnNets=gnnNets,
                                                      data=data, config=config).coalition
             tmp = dict()
             tmp[config.explainers.sparsity] = final_results
@@ -179,7 +177,7 @@ def pipeline(config):
         'sparsity': np.mean(sparsity_score_list),
         'STD of sparsity': np.std(sparsity_score_list),   
         'Time in seconds': end_time - start_time,
-        'Average Time': (end_time - start_time)/len(data_indices)
+        'Average Time': (end_time - start_time)/len(test_indices)
     }
 
     recorder.append(experiment_settings=['same', f"{config.explainers.sparsity}"],

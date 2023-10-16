@@ -1,4 +1,5 @@
 import os
+import sys
 import argparse
 import numpy as np
 import torch
@@ -7,6 +8,7 @@ import hydra
 from omegaconf import OmegaConf
 from torch_geometric.utils import add_remaining_self_loops
 from sklearn.metrics import accuracy_score, roc_auc_score
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 from utils import check_dir, Recorder, eval_metric, PlotUtils, fidelity_normalize_and_harmonic_mean
 from gnnNets import get_gnnNets
 from load_dataset import get_dataset, get_dataloader

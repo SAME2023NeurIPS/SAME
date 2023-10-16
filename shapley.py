@@ -1,8 +1,6 @@
 """
-shapely.py
-Description: implements about different types of approximation methods for shapley values
-Author: Haiyang Yu
-Date: 2/20/2021
+The shapely.py is brought from subgraphX in DIG library
+https://github.com/divelab/DIG/blob/dig-stable/dig/xgraph/method/shapley.py
 """
 import copy
 import torch

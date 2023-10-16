@@ -1,4 +1,6 @@
 import os
+import sys
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 import torch
 import hydra
 import numpy as np
@@ -126,7 +128,7 @@ def pipeline(config):
         device = torch.device('cuda', index=config.device_id)
     else:
         device = torch.device('cpu')
-
+    print(config.datasets.dataset_root)
     dataset = get_dataset(config.datasets.dataset_root,
                           config.datasets.dataset_name)
     dataset.data.x = dataset.data.x.float()
@@ -385,10 +387,11 @@ def pipeline(config):
 
 if __name__ == '__main__':
     import sys
+    wkdir = os.path.dirname(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..'))
     sys.argv.append('explainers=pgexplainer')
-    sys.argv.append(f"datasets.dataset_root={os.path.join(os.path.dirname(__file__), 'datasets')}")
-    sys.argv.append(f"models.gnn_saving_dir={os.path.join(os.path.dirname(__file__), 'checkpoints')}")
-    sys.argv.append(f"explainers.explainer_saving_dir={os.path.join(os.path.dirname(__file__), 'checkpoints')}")
-    sys.argv.append(f"explainers.explanation_result_dir={os.path.join(os.path.dirname(__file__), 'results')}")
-    sys.argv.append(f"record_filename={os.path.join(os.path.dirname(__file__), 'result_jsons')}")
+    sys.argv.append(f"datasets.dataset_root={os.path.join(wkdir, 'datasets')}")
+    sys.argv.append(f"models.gnn_saving_dir={os.path.join(wkdir, 'checkpoints')}")
+    sys.argv.append(f"explainers.explainer_saving_dir={os.path.join(wkdir, 'checkpoints')}")
+    sys.argv.append(f"explainers.explanation_result_dir={os.path.join(wkdir, 'results')}")
+    sys.argv.append(f"record_filename={os.path.join(wkdir, 'result_jsons')}")
     pipeline()

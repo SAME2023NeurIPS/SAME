@@ -7,7 +7,7 @@ from torch.optim import Adam
 from omegaconf import OmegaConf
 from utils import check_dir
 from gnnNets import get_gnnNets
-from dataset import get_dataset, get_dataloader
+from load_dataset import get_dataset, get_dataloader
 import torch.nn.functional as F
 from torch.optim.lr_scheduler import MultiStepLR
 
@@ -198,9 +198,9 @@ class TrainModel(object):
 
 @hydra.main(config_path="config", config_name="config")
 def main(config):
-    config.models.gnn_saving_path = os.path.join(
-        os.path.dirname(os.path.abspath(__file__)), "checkpoints"
-    )
+    # config.models.gnn_saving_dir = os.path.join(
+    #     os.path.dirname(os.path.abspath(__file__)), "checkpoints"
+    # )
     config.models.param = config.models.param[config.datasets.dataset_name]
     print(OmegaConf.to_yaml(config))
 
@@ -210,7 +210,7 @@ def main(config):
         device = torch.device("cpu")
 
     dataset = get_dataset(
-        dataset_root=config.datasets.dataset_root,
+        dataset_dir=config.datasets.dataset_root,
         dataset_name=config.datasets.dataset_name,
     )
     dataset.data.x = dataset.data.x.float()
@@ -244,7 +244,7 @@ def main(config):
             device=device,
             graph_classification=config.models.param.graph_classification,
             save_dir=os.path.join(
-                config.models.gnn_saving_path, config.datasets.dataset_name
+                config.models.gnn_saving_dir, config.datasets.dataset_name
             ),
             save_name=f"{config.models.gnn_name}_{len(config.models.param.gnn_latent_dim)}l",
             dataloader_params=dataloader_params,
@@ -256,7 +256,7 @@ def main(config):
             device=device,
             graph_classification=config.models.param.graph_classification,
             save_dir=os.path.join(
-                config.models.gnn_saving_path, config.datasets.dataset_name
+                config.models.gnn_saving_dir, config.datasets.dataset_name
             ),
             save_name=f"{config.models.gnn_name}_{len(config.models.param.gnn_latent_dim)}l",
         )
@@ -265,4 +265,13 @@ def main(config):
 
 
 if __name__ == "__main__":
+    import sys
+
+    cwd = os.path.dirname(os.path.abspath(__file__))
+
+    sys.argv.append('explainers=same')
+    sys.argv.append(f"datasets.dataset_root={os.path.join(cwd, 'datasets')}")
+    sys.argv.append(f"models.gnn_saving_dir={os.path.join(cwd, 'checkpoints')}")
+    # sys.argv.append(f"explainers.explanation_result_dir={os.path.join(cwd, 'results')}")
+    # sys.argv.append(f"record_filename={os.path.join(cwd, 'result_jsons')}")
     main()

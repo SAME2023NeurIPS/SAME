@@ -2,8 +2,9 @@ defaults:
   - models: gcn
   - datasets: bbbp
   - explainers: subgraphx
+  - _self_
 random_seed: 2
-device_id: 2
+device_id: 0
 record_filename: result_jsons
 save_plot: False
 sparsity: 0.8
