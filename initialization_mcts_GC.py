@@ -130,7 +130,7 @@ class MCTS():
         for rollout_idx in range(self.n_rollout):
             self.mcts_rollout(self.root)
             if verbose:
-                print(f"At the {rollout_idx} rollout, {len(self.state_map)} states that have been explored.")
+                print(f"[Initialization] Rollout {rollout_idx}, {len(self.state_map)} states that have been explored.")
 
         explanations = []
         for _, node in self.state_map.items():

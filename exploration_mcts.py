@@ -67,19 +67,12 @@ class exploration_MCTS():
             for each_node in unvisited_candidates:
                 new_graph_coalition = [candidate for candidate in self.candidates 
                                        if candidate in tree_node.coalition or candidate == each_node]
-                # new_explanation = []
-                # for substructure in tree_node.coalition:
-                #     new_explanation.extend(self.candidates[substructure])
-                # new_explanation = list(set(new_explanation))
 
                 new_graph_coalition = []
                 for candidate in range(len(self.candidates)): 
                     if candidate in tree_node.coalition or candidate == each_node: 
                         new_graph_coalition.append(candidate)
                 new_graph_coalition = list(set(new_graph_coalition))
-                # print(self.candidates[each_node].coalition)
-                # print(new_graph_coalition)
-                # input("Waiting")
 
                 new_graph_coalition = sorted(new_graph_coalition)
                 Find_same = False
@@ -139,13 +132,11 @@ class exploration_MCTS():
 
 def compute_scores(score_func, children: list): # list[exploration_MCTSNode]
     results = []
-    for child in children:  # child : exploration_MCTSNode
+    for child in children: 
         if child.P == 0:
             subgraph_coalition = []
             for substructure_id in child.coalition:             
                 subgraph_coalition.extend(child.candidates[substructure_id].coalition)
-                pass
-            # subgraph_coalition = [children.candidates[substructure] for substructure in child]
             score = score_func(subgraph_coalition, child.data)
         else:
             score = child.P
