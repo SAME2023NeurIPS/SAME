@@ -75,7 +75,7 @@ def find_explanations(results, max_nodes=5, **kwargs):
                                           score_func=score_func,
                                           n_rollout=10,
                                           explanation_size=max_nodes, 
-                                          c_puct=config.explainers.param.c_puct)
+                                          c_puct=kwargs.get('config').explainers.param.c_puct)
         results = mcts_state_map.mcts(verbose=True)
         pass
     

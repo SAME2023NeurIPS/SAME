@@ -4,6 +4,7 @@ import networkx as nx
 from torch_geometric.data import Data, Batch
 from torch_geometric.utils import to_networkx, remove_self_loops
 from shapley import mc_shapley, l_shapley, mc_l_shapley, gnn_score, NC_mc_l_shapley
+from initialization_mcts_GC import MCTSNode
 from functools import partial
 from collections import Counter
 
@@ -47,7 +48,7 @@ class exploration_MCTS():
         self.explanation_size = explanation_size
         self.c_puct = c_puct
 
-        self.MCTSNodeClass = partial(MCTSNode, data=self.data, candidates=self.candidates,
+        self.MCTSNodeClass = partial(exploration_MCTSNode, data=self.data, candidates=self.candidates,
                                      ori_graph=self.graph, c_puct=self.c_puct)
         self.root = self.MCTSNodeClass([])
         self.state_map = {str(self.root.coalition): self.root}
@@ -56,7 +57,7 @@ class exploration_MCTS():
         unvisited_candidates = [i for i in range(self.num_candidates) if i not in tree_node.coalition]
         current_explanation = []
         for substructure in tree_node.coalition:
-            current_explanation.extend(self.candidates[substructure])
+            current_explanation.extend(self.candidates[substructure].coalition)
         current_explanation = list(set(current_explanation))
         if len(current_explanation) >= self.explanation_size:
             return tree_node.P
@@ -66,10 +67,19 @@ class exploration_MCTS():
             for each_node in unvisited_candidates:
                 new_graph_coalition = [candidate for candidate in self.candidates 
                                        if candidate in tree_node.coalition or candidate == each_node]
-                new_explanation = []
-                for substructure in tree_node.coalition:
-                    new_explanation.extend(self.candidates[substructure])
-                new_explanation = list(set(new_explanation))
+                # new_explanation = []
+                # for substructure in tree_node.coalition:
+                #     new_explanation.extend(self.candidates[substructure])
+                # new_explanation = list(set(new_explanation))
+
+                new_graph_coalition = []
+                for candidate in range(len(self.candidates)): 
+                    if candidate in tree_node.coalition or candidate == each_node: 
+                        new_graph_coalition.append(candidate)
+                new_graph_coalition = list(set(new_graph_coalition))
+                # print(self.candidates[each_node].coalition)
+                # print(new_graph_coalition)
+                # input("Waiting")
 
                 new_graph_coalition = sorted(new_graph_coalition)
                 Find_same = False
@@ -108,29 +118,34 @@ class exploration_MCTS():
 
     def mcts(self, verbose=True):
         if verbose:
-            print(f"The nodes in graph is {self.graph.number_of_nodes()}")
+            print(f"There are {self.num_candidates} candidates")
         for rollout_idx in range(self.n_rollout):
             self.mcts_rollout(self.root)
             if verbose:
-                print(f"At the {rollout_idx} rollout, {len(self.state_map)} states that have been explored.")
+                print(f"[Exploration] Rollout {rollout_idx}: {len(self.state_map)} accumulative permutations.")
 
         explanations = []
         for _, node in self.state_map.items():
             graph_coalition = []
             for substructure in node.coalition:
-                graph_coalition.extend(self.candidates[substructure])
+                graph_coalition.extend(self.candidates[substructure].coalition)
             graph_coalition = list(set(graph_coalition))
-            explanations.append(graph_coalition)
+            n = MCTSNode(graph_coalition, data=node.data, ori_graph=node.ori_graph, P=node.P)
+            explanations.append(n)
             
         explanations = sorted(explanations, key=lambda x: x.P, reverse=True)
         return explanations
 
 
-def compute_scores(score_func, children: exploration_MCTSNode):
+def compute_scores(score_func, children: list): # list[exploration_MCTSNode]
     results = []
-    for child in children:
+    for child in children:  # child : exploration_MCTSNode
         if child.P == 0:
-            subgraph_coalition = [children.candidates[substructure] for substructure in child.coalition]
+            subgraph_coalition = []
+            for substructure_id in child.coalition:             
+                subgraph_coalition.extend(child.candidates[substructure_id].coalition)
+                pass
+            # subgraph_coalition = [children.candidates[substructure] for substructure in child]
             score = score_func(subgraph_coalition, child.data)
         else:
             score = child.P

@@ -100,7 +100,7 @@ param:
     verbose: True
     single_explanation_size: 2
     candidate_size: 7
-    explanation_exploration_method: 'permutation'
+    explanation_exploration_method: 'mcts'
   bace:
     rollout: 20
     high2low: True

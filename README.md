@@ -53,7 +53,7 @@ python train_gnns.py models='gcn' datasets='mutag'
   - For other datasets and GNNs, please create the corresponding files in `config`. 
 
 ```bash
-python train_gnns.py datasets=mutag models=gin
+python train_gnns.py datasets='mutag' models='gin'
 ```
 
 - One-Click run: use the following script to run the experiments thoroughly. The script will automatically run the experiments in the sparsity $[0.5,0.6,0.7,0.8]$. 
