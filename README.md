@@ -1,6 +1,7 @@
 <h1 align="center">:fire:SAME:fire:</h1>
 <p align="center">
 <a href="https://same2023neurips.github.io/"><img src="https://img.shields.io/website-up-down-green-red/http/shields.io.svg"></a>
+<a href="https://www.researchgate.net/publication/374849556_SAME_Uncovering_GNN_Black_Box_with_Structure-aware_Shapley-based_Multipiece_Explanation"> <img alt="License" src="https://img.shields.io/static/v1?label=Pub&message=NeurIPS%2722&color=blue"> </a>
 </p>
 
 This repo contains PyTorch implementation of the paper: `SAME: Uncovering GNN Black Box with Structure-aware Shapley-based Multipiece Explanations` in 2023 NeurIPS.
