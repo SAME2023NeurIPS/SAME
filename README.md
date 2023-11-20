@@ -1,7 +1,7 @@
 <h1 align="center">:fire:SAME:fire:</h1>
 <p align="center">
 <a href="https://same2023neurips.github.io/"><img src="https://img.shields.io/website-up-down-green-red/http/shields.io.svg"></a>
-<a href="https://www.researchgate.net/publication/374849556_SAME_Uncovering_GNN_Black_Box_with_Structure-aware_Shapley-based_Multipiece_Explanation"> <img alt="License" src="https://img.shields.io/static/v1?label=Pub&message=NeurIPS%2723&color=blue"> </a>
+<a href="https://www.researchgate.net/publication/374849556_SAME_Uncovering_GNN_Black_Box_with_Structure-aware_Shapley-based_Multipiece_Explanation"> <img alt="License" src="https://img.shields.io/static/v1?label=Pub&message=NeurIPS%2723&color=blue"></a>
 <a href="https://neurips.cc/media/PosterPDFs/NeurIPS%202023/70657.png?t=1700470630.960106"> <img src="https://img.shields.io/badge/Poster-grey?logo=airplayvideo&logoColor=white" alt="Poster"></a>
 </p>
 
